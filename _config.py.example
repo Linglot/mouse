@@ -1,0 +1,5 @@
+TOKEN = "Your token"
+
+PREFIX = ';'
+
+VOICE_CHANNEL_DIVIDER = '|'
