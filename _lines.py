@@ -1,6 +1,6 @@
 """
 {} - Placeholder, be careful with it.
-I.e. in "My name is {}" it's get changed automatically to user's name.
+I.e. in "My name is {}" it gets changed automatically to user's name.
 After each line with a placeholder there's a comment with its "future" content.
 """
 

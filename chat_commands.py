@@ -3,6 +3,7 @@ import random
 from _lines import *
 from utils import *
 
+
 class ChatCommands:
     def __init__(self, bot):
         print("Chat commands were initialized")
