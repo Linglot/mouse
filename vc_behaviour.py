@@ -23,7 +23,7 @@ class VCBehaviour:
                 else:
                     print("{} left from {} but there's no need to edit".format(before.name, vc.name))
             else:
-                print("{} just became empty, but I can't edit it".format(vc.name))
+                print("{} left from {} but I can't edit anyways ¯\_(ツ)_/¯".format(before.name, vc.name))
 
 
 def setup(bot):
