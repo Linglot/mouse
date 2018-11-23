@@ -19,8 +19,13 @@ if __name__ == "__main__":
     finally:
         print("Default help command was removed")
 
+    # Loading modules
     for extension in modules:
         print("Extensions: {} module was loaded.".format(extension))
         bot.load_extension(extension)
 
 bot.run(TOKEN, bot=True, reconnect=True)
+
+# TODO: make versions
+# TODO: backups
+# TODO: roles merge search
