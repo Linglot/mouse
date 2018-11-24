@@ -25,5 +25,5 @@ about_gh_desc   = "If you want to help us with our bot or just look at our ~~cra
 about_inv_link  = ":u6708: Linguistic lot"
 about_inv_desc  = "Here's an [invite link]({}) for you, if you want to join our server".format(_config.INV_LINK) # TODO: Prolly needs changing, but not now
 
-version_currently = "Currently version is {}!" # Version number
-version_footer = "Sincerely yours {}" # Bot's name
+version_currently = "Current version is {}!" # Version number
+version_footer = "Sincerely yours, {}" # Bot's name
