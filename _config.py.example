@@ -4,18 +4,32 @@ TOKEN = "........"
 # Technically does nothing
 CURRENT_VERSION = "0.1.1"
 
+# Commands prefix
 PREFIX = ';'
 
+# Divider for voice channel's name changing stuff.
+# Probably will be replaced or changed later
 VOICE_CHANNEL_DIVIDER = '|'
+
+# All the possible settings could be changed here
+settings = {
+    'change_channel_lang': {  # Restriction for changing channel's language
+        'max_lang_name_length': 20
+    },
+    'combined_search': {  # Restriction for combined search
+        'role_limit': 4,  # The number of maximum combination of roles in 1 query
+        'max_user_name_length': 20  # If the name longer than this, it gets cut off
+    }
+}
 
 """ All the constant below aren't really code related """
 
 # 0xRRGGBB aka HEX
-MAIN_COLOR      = 0x091A4C
+MAIN_COLOR = 0x091A4C
 SECONDARY_COLOR = 0xD86156
-OFF_COLOR_1     = 0xF2B53C
-OFF_COLOR_2     = 0x5F6662
-OFF_COLOR_3     = 0x3BCCB3
+OFF_COLOR_1 = 0xF2B53C
+OFF_COLOR_2 = 0x5F6662
+OFF_COLOR_3 = 0x3BCCB3
 
 GITHUB_LINK = "https://github.com/Linglot/mouse"
 INV_LINK = "https://discord.gg/uFWNUBQ"
