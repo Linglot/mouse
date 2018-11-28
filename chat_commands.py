@@ -133,7 +133,7 @@ class ChatCommands:
         # Grabbing the lines
         lines = [
             text_lines['combined_search']['row_1_column'],
-            str(number_of_results), # Just the number
+            str(number_of_results),  # Just the number
             text_lines['combined_search']['row_3_column']
         ]
 
