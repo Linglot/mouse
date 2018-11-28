@@ -100,7 +100,7 @@ class ChatCommands:
         server_roles = [role.name.lower() for role in server.roles]
         for role in searching_roles:
             # If at least one doesn't = rip
-            if not role in server_roles:
+            if role not in server_roles:
                 embed_error = discord.Embed(
                     description=text_lines['combined_search']['no_such_role'].format(role.title()),
                     colour=discord.Colour(SECONDARY_COLOR))
