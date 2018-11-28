@@ -46,7 +46,7 @@ class ChatCommands:
             await self.bot.send_message(ctx.message.channel, lang_make_shorter)
             return
 
-        # If the name could be splitted (or had been changed in the past, in other words)
+        # If the name could be split (or had been changed in the past, in other words)
         # when we just need to change the last part
         if splittable(vc.name):
             # This is poop code right there, TODO: rewrite
@@ -96,7 +96,7 @@ class ChatCommands:
             await self.bot.send_message(ctx.message.channel, embed=embed_error)
             return
 
-        # Does these roles even exist?
+        # Do these roles even exist?
         server_roles = [role.name.lower() for role in server.roles]
         for role in searching_roles:
             # If at least one doesn't = rip
