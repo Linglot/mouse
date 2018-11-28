@@ -10,7 +10,7 @@ class VCBehaviour:
         # VC user came from(!)
         vc = before.voice.voice_channel
 
-        # What would I change, if he's wasn't even in VC?
+        # What would I change, if they aren't even in VC?
         if vc is not None:
             # Check the permissions at first, and the number of people in the channel
             if can_edit_channel(self.bot, vc):
