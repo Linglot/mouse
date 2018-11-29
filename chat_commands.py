@@ -191,6 +191,7 @@ class ChatCommands:
         await self.bot.send_message(ctx.message.channel, embed=embed)
         
     #commit #1
+    # 2
 
 
 def setup(bot):
