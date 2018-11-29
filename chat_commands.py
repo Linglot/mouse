@@ -189,6 +189,8 @@ class ChatCommands:
         embed.set_footer(text=version_footer.format(self.bot.user.name), icon_url=self.bot.user.avatar_url)
 
         await self.bot.send_message(ctx.message.channel, embed=embed)
+        
+    #commit #1
 
 
 def setup(bot):
