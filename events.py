@@ -1,8 +1,8 @@
 from utils import *
-
+from MrMouse import logger
 
 # Class for voice chat related events
-class VCBehaviour:
+class Events:
     def __init__(self, client):
         self.bot = client
 
@@ -22,6 +22,12 @@ class VCBehaviour:
             else:
                 print("{} left from {} but I can't edit anyways ¯\_(ツ)_/¯".format(before.name, vc.name))
 
+    async def on_message(self, message):
+        print(message)
+        logger.info(message)
+        await self.bot.process_commands(message)
+
+
 
 def setup(bot):
-    bot.add_cog(VCBehaviour(bot))
+    bot.add_cog(Events(bot))
