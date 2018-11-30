@@ -24,7 +24,7 @@ if __name__ == "__main__":
         print("Extensions: {} module was loaded.".format(extension))
         bot.load_extension(extension)
 
-bot.run(TOKEN, bot=True, reconnect=True)
+bot.run(TOKEN)
 
 # TODO: make versions
 # TODO: backups
