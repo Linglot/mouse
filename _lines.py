@@ -17,7 +17,7 @@ text_lines = {
         # 'row_2_column' It's not in use for now
         'row_3_column': "☆",
         'row_1_column_only': "Results are: ",  # when <6 results, this text is shown instead of 'row_1_column"
-        'and_many_more': "And {} more…" # A number of users
+        'and_many_more': "And {} more…"  # A number of users
     }
 }
 
@@ -34,7 +34,7 @@ lang_were_reset = "Channel name was reset to {}"  # Language name
 lang_cant_edit = "Can't edit that channel's name. Try other ones, such as Lobby, Park, Practice or Lecture Hall"
 lang_must_be_in_vc = "You must be in a voice channel"
 
-about_desc = "Heyo! This bot was developed specially for Linglot server. " \
+about_desc = "Heyo! This bot was developed specially for the Linglot server. " \
              "If you have any suggestions or you've found a bug, please contact server staff."
 about_gh_link = ":notepad_spiral: Github"
 about_gh_desc = "If you want to help us with our bot or just look at our ~~crappy~~ code, you can do it [here]({})".format(
