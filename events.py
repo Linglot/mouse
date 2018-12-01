@@ -1,5 +1,6 @@
 from utils import *
-from MrMouse import logger
+from logger import logger
+
 
 # Class for voice chat related events
 class Events:
@@ -11,22 +12,11 @@ class Events:
         vc = before.voice.voice_channel
 
         # What would I change, if the user isn't even in VC?
-        if vc is not None:
-            # Check the permissions at first, and the number of people in the channel
-            if can_edit_channel(self.bot, vc):
-                if len(vc.voice_members) == 0 and splittable(vc.name):
-                    await self.bot.edit_channel(vc, name=get_original_name(vc.name))
-                    print("Removed language from {}".format(vc.name))
-                else:
-                    print("{} left from {} but there's no need to edit".format(before.name, vc.name))
-            else:
-                print("{} left from {} but I can't edit anyways ¯\_(ツ)_/¯".format(before.name, vc.name))
+        # Check the permissions at first, and the number of people in the channel
 
-    async def on_message(self, message):
-        print(message)
-        logger.info(message)
-        await self.bot.process_commands(message)
-
+        if vc is not None and can_edit_channel(self.bot, vc) and len(vc.voice_members) == 0 and splittable(vc.name):
+            await self.bot.edit_channel(vc, name=get_original_name(vc.name))
+            logger.info("Removed language from {}".format(vc.name))
 
 
 def setup(bot):
