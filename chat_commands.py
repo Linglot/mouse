@@ -1,4 +1,6 @@
 import discord
+
+from logger import logger
 from _config import *
 from discord.ext import commands
 from _lines import *
@@ -55,6 +57,7 @@ class ChatCommands:
         # Otherwise add a suffix
         else:
             await self.bot.edit_channel(vc, name="{} {} {}".format(vc.name, VOICE_CHANNEL_DIVIDER, lang_name))
+
         await self.bot.send_message(ctx.message.channel, lang_were_set.format(lang_name))
 
     # TODO: Remove code duplication with VC behaviour's function
@@ -100,7 +103,7 @@ class ChatCommands:
         server_roles = [role.name.lower() for role in server.roles]
         for role in searching_roles:
             # If at least one doesn't = rip
-            if not role in server_roles:
+            if role not in server_roles:
                 embed_error = discord.Embed(
                     description=text_lines['combined_search']['no_such_role'].format(role.title()),
                     colour=discord.Colour(SECONDARY_COLOR))

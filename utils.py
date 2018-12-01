@@ -12,7 +12,7 @@ def get_original_name(name):
     return name.split(" {} ".format(VOICE_CHANNEL_DIVIDER))[0]
 
 
-# Moki will kill me, if he sees this.
+# Return true if the bot has "manage channel" permission, otherwise false
 def can_edit_channel(bot, channel):
     return channel.permissions_for(channel.server.get_member(bot.user.id)).manage_channels
 

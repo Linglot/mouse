@@ -1,10 +1,9 @@
-# Work with Python 3.6
 from discord.ext.commands import Bot
 from _config import *
 
 bot = Bot(command_prefix=PREFIX)
 
-modules = ['chat_commands', 'vc_behaviour']
+modules = ['chat_commands', 'events']
 
 
 @bot.event
@@ -21,11 +20,7 @@ if __name__ == "__main__":
 
     # Loading modules
     for extension in modules:
-        print("Extensions: {} module was loaded.".format(extension))
         bot.load_extension(extension)
+        print("Extensions: {} module was loaded.".format(extension))
 
-bot.run(TOKEN, bot=True, reconnect=True)
-
-# TODO: make versions
-# TODO: backups
-# TODO: roles merge search
+bot.run(TOKEN)

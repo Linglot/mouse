@@ -2,7 +2,7 @@
 TOKEN = "........"
 
 # Technically does nothing
-CURRENT_VERSION = "0.1.1"
+CURRENT_VERSION = "0.1.2"
 
 # Commands prefix
 PREFIX = ';'
@@ -13,6 +13,9 @@ VOICE_CHANNEL_DIVIDER = '|'
 
 # All the possible settings could be changed here
 settings = {
+    'logging': {  # Settings for logging features
+        'file_name': 'discord.log'
+    },
     'change_channel_lang': {  # Restriction for changing channel's language
         'max_lang_name_length': 20
     },
