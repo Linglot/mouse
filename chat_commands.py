@@ -1,11 +1,9 @@
 import discord
-
-from logger import logger
+import random
 from _config import *
 from discord.ext import commands
-from _lines import *
+from _lines import text_lines
 from utils import *
-import random
 
 
 class ChatCommands:
@@ -19,14 +17,14 @@ class ChatCommands:
 
         # If user isn't even in VC
         if ctx.message.author is None or ctx.message.author.voice.voice_channel is None:
-            await self.bot.send_message(ctx.message.channel, lang_must_be_in_vc)
+            await self.bot.send_message(ctx.message.channel, text_lines['voice_channel_language']['lang_must_be_in_vc'])
             return
 
         vc = ctx.message.author.voice.voice_channel
 
         # Permissions check
         if not can_edit_channel(self.bot, vc):
-            await self.bot.send_message(ctx.message.channel, lang_cant_edit)
+            await self.bot.send_message(ctx.message.channel, text_lines['voice_channel_language']['lang_cant_edit'])
             return
 
         # Since we get out name as an array of strings, we should connect 'em
@@ -35,7 +33,8 @@ class ChatCommands:
 
         # Empty? Pass
         if len(lang_name.strip()) == 0:
-            await self.bot.send_message(ctx.message.channel, random.choice(lang_if_nothing))
+            await self.bot.send_message(ctx.message.channel,
+                                        random.choice(text_lines['voice_channel_language']['lang_if_nothing']))
             return
 
         # If we get "reset" then we're going to use another function
@@ -45,7 +44,7 @@ class ChatCommands:
 
         # I wish my iq were that big (20 chars max length)
         if len(lang_name) > settings['change_channel_lang']['max_lang_name_length']:
-            await self.bot.send_message(ctx.message.channel, lang_make_shorter)
+            await self.bot.send_message(ctx.message.channel, text_lines['voice_channel_language']['lang_make_shorter'])
             return
 
         # If the name could be split (or had been changed in the past, in other words)
@@ -58,7 +57,8 @@ class ChatCommands:
         else:
             await self.bot.edit_channel(vc, name="{} {} {}".format(vc.name, VOICE_CHANNEL_DIVIDER, lang_name))
 
-        await self.bot.send_message(ctx.message.channel, lang_were_set.format(lang_name))
+        await self.bot.send_message(ctx.message.channel,
+                                    text_lines['voice_channel_language']['lang_were_set'].format(lang_name))
 
     # TODO: Remove code duplication with VC behaviour's function
     # Command for removing language name from VC's name
@@ -66,7 +66,7 @@ class ChatCommands:
     @commands.command(aliases=["resetlang", "rl"], pass_context=True)
     async def reset_lang(self, ctx):
         if ctx.message.author is None or ctx.message.author.voice.voice_channel is None:
-            await self.bot.send_message(ctx.message.channel, lang_must_be_in_vc)
+            await self.bot.send_message(ctx.message.channel, text_lines['voice_channel_language']['lang_must_be_in_vc'])
             return
 
         vc = ctx.message.author.voice.voice_channel
@@ -75,9 +75,10 @@ class ChatCommands:
         # If we can't edit channel, then we can't reset its name
         if can_edit_channel(self.bot, vc):
             await self.bot.edit_channel(vc, name=oc_name)
-            await self.bot.send_message(ctx.message.channel, lang_were_reset.format(oc_name))
+            await self.bot.send_message(ctx.message.channel,
+                                        text_lines['voice_channel_language']['lang_were_reset'].format(oc_name))
         else:
-            await self.bot.send_message(ctx.message.channel, lang_cant_edit)
+            await self.bot.send_message(ctx.message.channel, text_lines['voice_channel_language']['lang_cant_edit'])
 
     # Command for searching users who have multiple tags
     # Syntax is: lang
@@ -170,14 +171,16 @@ class ChatCommands:
 
         # Creating table
         embed = discord.Embed(colour=discord.Colour(OFF_COLOR_3),
-                              description=about_desc)
+                              description=text_lines['about']['about_desc'])
 
         embed.set_thumbnail(url=self.bot.user.avatar_url)
         embed.set_author(name=self.bot.user.name)
-        embed.set_footer(text=version_currently.format(CURRENT_VERSION))
+        embed.set_footer(text=text_lines['version']['version_currently'].format(CURRENT_VERSION))
 
-        embed.add_field(name=about_gh_link, value=about_gh_desc, inline=True)
-        embed.add_field(name=about_inv_link, value=about_inv_desc, inline=True)
+        embed.add_field(name=text_lines['about']['about_gh_link'], value=text_lines['about']['about_gh_desc'],
+                        inline=True)
+        embed.add_field(name=text_lines['about']['about_inv_link'], value=text_lines['about']['about_inv_desc'],
+                        inline=True)
 
         await self.bot.send_message(ctx.message.channel, embed=embed)
 
@@ -187,9 +190,10 @@ class ChatCommands:
     async def show_version(self, ctx):
 
         # Creating table
-        embed = discord.Embed(title=version_currently.format(CURRENT_VERSION),
+        embed = discord.Embed(title=text_lines['version']['version_currently'].format(CURRENT_VERSION),
                               colour=discord.Colour(OFF_COLOR_3))
-        embed.set_footer(text=version_footer.format(self.bot.user.name), icon_url=self.bot.user.avatar_url)
+        embed.set_footer(text=text_lines['version']['version_footer'].format(self.bot.user.name),
+                         icon_url=self.bot.user.avatar_url)
 
         await self.bot.send_message(ctx.message.channel, embed=embed)
 
