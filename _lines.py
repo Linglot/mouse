@@ -30,12 +30,18 @@ text_lines = {
         'no_such_role': "There's no **{}** role on the server",  # Role name
         'no_users_found': "No users were found",
         'try_another_one': "Maybe you should try another combination?",
-        'users_for': "Users for: {}",  # Role list
-        'row_1_column': "Total # of users",
-        # 'row_2_column' It's not in use for now
-        'row_3_column': "☆",
-        'row_1_column_only': "Results are: ",  # when <6 results, this text is shown instead of 'row_1_column"
+        'x_users_for': "{} users for: {}",  # Number of users, Role list
+        'one_user_for': "1 user for: {}",  # Role list
+        'one_user_column_header': "The one and only",
+        'many_user_column_header': "{}-{}", # Start number, End number
         'and_many_more': "And {} more…"  # A number of users
+
+        ### These are not in use for now ###
+        ####################################
+        # 'row_1_column': "Total # of users",
+        # 'row_2_column'
+        # 'row_3_column': "☆",
+        # 'row_1_column_only': "Results are: ",  # when <6 results, this text is shown instead of 'row_1_column"
     },
 
     # Text lines for ;info command

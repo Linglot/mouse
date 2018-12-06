@@ -129,20 +129,22 @@ class ChatCommands:
             return
 
         # Making the title string ready
-        title = text_lines['combined_search']['users_for'].format(
-            ", ".join([role.title() for role in searching_roles]))
+        if number_of_results == 1:
+            title = text_lines['combined_search']['one_user_for'].format(
+                ", ".join([role.title() for role in searching_roles]))
+        else:
+            title = text_lines['combined_search']['x_users_for'].format(
+                number_of_results, ", ".join([role.title() for role in searching_roles]))
 
         embed = discord.Embed(title=title, colour=discord.Colour(MAIN_COLOR))
 
-        # Grabbing the lines
-        lines = [
-            text_lines['combined_search']['row_1_column'],
-            str(number_of_results),  # Just the number
-            text_lines['combined_search']['row_3_column']
-        ]
-
         if number_of_results < 6:
-            embed.add_field(name=text_lines['combined_search']['row_1_column_only'],
+            if number_of_results == 1:
+                header = text_lines['combined_search']['one_user_column_header']
+            else:
+                header = text_lines['combined_search']['many_user_column_header'].format(1, number_of_results)
+
+            embed.add_field(name=header,
                             value='\n'.join([member.display_name for member in found_users]),
                             inline=True)
         else:
@@ -154,12 +156,18 @@ class ChatCommands:
                 embed.set_footer(text=text_lines['combined_search']['and_many_more'].format(excluded))
 
             # Dividing roles by the 3 chunks, removing big names and making columns
+            column_end_number = 0
             for i, chunk in enumerate(create_chunks(found_users, 3)):
+                # Bunch of useless variables, but it's better then count this stuff on the fly.
+                old_cz = column_end_number + 1
+                column_end_number += len(chunk)
+                header = text_lines['combined_search']['many_user_column_header'].format(old_cz, column_end_number)
+
                 row_users_list = [
                     add_dots(member.display_name, settings['combined_search']['max_user_name_length'])
                     for member in chunk
                 ]
-                embed.add_field(name=lines[i], value='\n'.join(row_users_list), inline=True)
+                embed.add_field(name=header, value='\n'.join(row_users_list), inline=True)
 
         await self.bot.send_message(ctx.message.channel, embed=embed)
 
