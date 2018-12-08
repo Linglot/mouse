@@ -1,4 +1,6 @@
-from _config import VOICE_CHANNEL_DIVIDER
+import discord
+
+from _config import VOICE_CHANNEL_DIVIDER, SECONDARY_COLOR, OFF_COLOR_3
 import more_itertools
 
 
@@ -26,3 +28,14 @@ def create_chunks(list_to_divide, number_of_chunks):
 def add_dots(string, limit):
     # "…" " " - 3 dots + 2x unbreakable spaces (alt+0160)
     return (string[:limit] + '…  ') if len(string) > limit else string
+
+
+# Just a convenient way to make error and info boxes
+def error_embed(message):
+    embed = discord.Embed(description=message, colour=discord.Colour(SECONDARY_COLOR))
+    return embed
+
+
+def info_embed(message):
+    embed = discord.Embed(description=message, colour=discord.Colour(OFF_COLOR_3))
+    return embed

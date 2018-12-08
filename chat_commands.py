@@ -1,4 +1,3 @@
-import discord
 import random
 from _config import *
 from discord.ext import commands
@@ -17,14 +16,16 @@ class ChatCommands:
 
         # If user isn't even in VC
         if ctx.message.author is None or ctx.message.author.voice.voice_channel is None:
-            await self.bot.send_message(ctx.message.channel, text_lines['voice_channel_language']['lang_must_be_in_vc'])
+            embed = error_embed(text_lines['voice_channel_language']['lang_must_be_in_vc'])
+            await self.bot.send_message(ctx.message.channel, embed=embed)
             return
 
         vc = ctx.message.author.voice.voice_channel
 
         # Permissions check
         if not can_edit_channel(self.bot, vc):
-            await self.bot.send_message(ctx.message.channel, text_lines['voice_channel_language']['lang_cant_edit'])
+            embed = error_embed(text_lines['voice_channel_language']['lang_cant_edit'])
+            await self.bot.send_message(ctx.message.channel, embed=embed)
             return
 
         # Since we get out name as an array of strings, we should connect 'em
@@ -33,8 +34,8 @@ class ChatCommands:
 
         # Empty? Pass
         if len(lang_name.strip()) == 0:
-            await self.bot.send_message(ctx.message.channel,
-                                        random.choice(text_lines['voice_channel_language']['lang_if_nothing']))
+            embed = error_embed(random.choice(text_lines['voice_channel_language']['lang_if_nothing']))
+            await self.bot.send_message(ctx.message.channel, embed=embed)
             return
 
         # If we get "reset" then we're going to use another function
@@ -44,7 +45,8 @@ class ChatCommands:
 
         # I wish my iq were that big (20 chars max length)
         if len(lang_name) > settings['change_channel_lang']['max_lang_name_length']:
-            await self.bot.send_message(ctx.message.channel, text_lines['voice_channel_language']['lang_make_shorter'])
+            embed = error_embed(text_lines['voice_channel_language']['lang_make_shorter'])
+            await self.bot.send_message(ctx.message.channel, embed=embed)
             return
 
         # If the name could be split (or had been changed in the past, in other words)
@@ -57,8 +59,8 @@ class ChatCommands:
         else:
             await self.bot.edit_channel(vc, name="{} {} {}".format(vc.name, VOICE_CHANNEL_DIVIDER, lang_name))
 
-        await self.bot.send_message(ctx.message.channel,
-                                    text_lines['voice_channel_language']['lang_were_set'].format(lang_name))
+        info = info_embed(text_lines['voice_channel_language']['lang_were_set'].format(lang_name))
+        await self.bot.send_message(ctx.message.channel, embed=info)
 
     # TODO: Remove code duplication with VC behaviour's function
     # Command for removing language name from VC's name
@@ -66,7 +68,8 @@ class ChatCommands:
     @commands.command(aliases=["resetlang", "rl"], pass_context=True)
     async def reset_lang(self, ctx):
         if ctx.message.author is None or ctx.message.author.voice.voice_channel is None:
-            await self.bot.send_message(ctx.message.channel, text_lines['voice_channel_language']['lang_must_be_in_vc'])
+            embed = error_embed(text_lines['voice_channel_language']['lang_must_be_in_vc'])
+            await self.bot.send_message(ctx.message.channel, embed=embed)
             return
 
         vc = ctx.message.author.voice.voice_channel
@@ -75,10 +78,12 @@ class ChatCommands:
         # If we can't edit channel, then we can't reset its name
         if can_edit_channel(self.bot, vc):
             await self.bot.edit_channel(vc, name=oc_name)
-            await self.bot.send_message(ctx.message.channel,
-                                        text_lines['voice_channel_language']['lang_were_reset'].format(oc_name))
+            info = info_embed(text_lines['voice_channel_language']['lang_were_reset'].format(oc_name))
+            await self.bot.send_message(ctx.message.channel, embed=info)
+
         else:
-            await self.bot.send_message(ctx.message.channel, text_lines['voice_channel_language']['lang_cant_edit'])
+            embed = error_embed(text_lines['voice_channel_language']['lang_cant_edit'])
+            await self.bot.send_message(ctx.message.channel, embed=embed)
 
     # Command for searching users who have multiple tags
     # Syntax is: lang
@@ -92,12 +97,9 @@ class ChatCommands:
 
         # You can use use nadeko's .inrole, if you want to get 1 role only
         if len(searching_roles) < 2 or len(searching_roles) > settings['combined_search']['role_limit']:
-            embed_error = discord.Embed(
-                description=text_lines['combined_search']['min_max_roles_amount'].format(
-                    str(settings['combined_search']['role_limit'])),
-                colour=discord.Colour(SECONDARY_COLOR))
-
-            await self.bot.send_message(ctx.message.channel, embed=embed_error)
+            embed = error_embed(text_lines['combined_search']['min_max_roles_amount'].format(
+                str(settings['combined_search']['role_limit'])))
+            await self.bot.send_message(ctx.message.channel, embed=embed)
             return
 
         # Do these roles even exist?
@@ -105,11 +107,8 @@ class ChatCommands:
         for role in searching_roles:
             # If at least one doesn't = rip
             if role not in server_roles:
-                embed_error = discord.Embed(
-                    description=text_lines['combined_search']['no_such_role'].format(role.title()),
-                    colour=discord.Colour(SECONDARY_COLOR))
-
-                await self.bot.send_message(ctx.message.channel, embed=embed_error)
+                embed = error_embed(text_lines['combined_search']['no_such_role'].format(role.title()))
+                await self.bot.send_message(ctx.message.channel, embed=embed)
                 return
 
         # Looking for peeps
@@ -121,11 +120,11 @@ class ChatCommands:
         # If the result is 0 peeps, we have to show that
         number_of_results = len(found_users)
         if number_of_results == 0:
-            embed_error = discord.Embed(title=text_lines['combined_search']['no_users_found'],
+            no_results = discord.Embed(title=text_lines['combined_search']['no_users_found'],
                                         description=text_lines['combined_search']['try_another_one'],
                                         colour=discord.Colour(MAIN_COLOR))
 
-            await self.bot.send_message(ctx.message.channel, embed=embed_error)
+            await self.bot.send_message(ctx.message.channel, embed=no_results)
             return
 
         # Making the title string ready

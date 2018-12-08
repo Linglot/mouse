@@ -16,9 +16,10 @@ class Events:
             await self.bot.edit_channel(vc, name=get_original_name(vc.name))
             logger.info("Removed language tag from {}".format(vc.name))
 
+    # For logging only.
     async def on_command(self, command, ctx):
         msg = ctx.message
-        logger.info('{}#{} send \"{}\"'.format(msg.author.name, msg.author.discriminator, msg.content))
+        logger.info('{}#{} sent \"{}\"'.format(msg.author.name, msg.author.discriminator, msg.content))
 
 
 def setup(bot):
