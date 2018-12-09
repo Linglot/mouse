@@ -3,7 +3,12 @@ from _config import *
 
 bot = Bot(command_prefix=PREFIX)
 
-modules = ['chat_commands', 'events']
+# TODO: k python said fuk you so we should be back to the previous version but exclude the logic from there.
+modules = ['commands/about',
+           'commands/change_vc_name',
+           'commands/combine_search',
+           'commands/version',
+           'events']
 
 
 @bot.event
