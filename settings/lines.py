@@ -25,7 +25,7 @@ text_lines = {
 
     # Text lines for ;who command
     'combined_search': {
-        'min_max_roles_amount': "You have to search for at least 2 roles and maximum of {}",  # Number of maximum roles
+        'min_max_roles_amount': "You have to search for at least 1 role and a maximum of {}",  # Number of maximum roles
         'no_such_role': "There's no **{}** role on the server",  # Role name
         'no_users_found': "No users were found",
         'try_another_one': "Maybe you should try another combination?",

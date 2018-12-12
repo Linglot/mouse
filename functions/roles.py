@@ -7,8 +7,8 @@ from utils.tools import *
 async def role_search(bot, server, channel, searching_roles):
     found_users = []
 
-    # You can use use nadeko's .inrole, if you want to get 1 role only
-    if len(searching_roles) < 2 or len(searching_roles) > settings['combined_search']['role_limit']:
+    # No or too many roles given equals "Bye"
+    if len(searching_roles) < 1 or len(searching_roles) > settings['combined_search']['role_limit']:
         embed = error_embed(text_lines['combined_search']['min_max_roles_amount'].format(
             str(settings['combined_search']['role_limit'])))
         await bot.send_message(channel, embed=embed)

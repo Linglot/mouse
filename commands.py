@@ -40,6 +40,7 @@ class ChatCommands:
 
         # Dividing roles to a list, removing unnecessary spaces and making it lowercase
         # "  native english,    fluent english " -> ["native english", "fluent english"]
+        # TODO: check and remove duplicates!
         searching_roles = [role.strip().lower() for role in " ".join(args).split(",") if role.strip() != ""]
 
         await roles.role_search(self.bot, server, channel, searching_roles)
