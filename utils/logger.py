@@ -1,5 +1,5 @@
 import logging
-from _config import settings
+from settings.config import settings
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.INFO)

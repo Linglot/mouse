@@ -1,14 +1,10 @@
 from discord.ext.commands import Bot
-from _config import *
+
+from settings.config import TOKEN, PREFIX
 
 bot = Bot(command_prefix=PREFIX)
 
-# TODO: k python said fuk you so we should be back to the previous version but exclude the logic from there.
-modules = ['commands/about',
-           'commands/change_vc_name',
-           'commands/combine_search',
-           'commands/version',
-           'events']
+modules = ['commands', 'events']
 
 
 @bot.event

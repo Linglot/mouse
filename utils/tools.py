@@ -1,6 +1,6 @@
 import discord
 
-from _config import VOICE_CHANNEL_DIVIDER, SECONDARY_COLOR, OFF_COLOR_3
+from settings.config import VOICE_CHANNEL_DIVIDER, SECONDARY_COLOR, OFF_COLOR_3
 import more_itertools
 
 

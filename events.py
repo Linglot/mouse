@@ -1,5 +1,5 @@
-from utils import can_edit_channel, get_original_name, splittable
-from logger import logger
+from utils.logger import logger
+from utils.tools import can_edit_channel, get_original_name, splittable
 
 
 class Events:

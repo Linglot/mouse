@@ -1,14 +1,13 @@
-import _config
-
 """
-{} - Placeholder, be careful with it.
+{} is a placeholder, be careful with it.
 I.e. in "My name is {}" it gets changed automatically to user's name.
 After each line with a placeholder there's a comment with its "future" content.
 """
+from settings import config
 
 text_lines = {
 
-    # Text lines for ;lang and ;resetlang commands
+    # Text lines for ;lang and ;resetlang functions
     'voice_channel_language': {
         'lang_if_nothing': [
             "Language set to absolutely nothing",
@@ -33,7 +32,7 @@ text_lines = {
         'x_users_for': "{} users for: {}",  # Number of users, Role list
         'one_user_for': "1 user for: {}",  # Role list
         'one_user_column_header': "The one and only",
-        'many_user_column_header': "{}-{}", # Start number, End number
+        'many_user_column_header': "{}-{}",  # Start number, End number
         'and_many_more': "And {} more…"  # A number of users
 
         ### These are not in use for now ###
@@ -50,10 +49,10 @@ text_lines = {
                       "If you have any suggestions or bug reports, please contact the server staff.",
         'about_gh_link': ":notepad_spiral: Github",
         'about_gh_desc': "If you want to help us with our bot, or just look at our ~~crappy~~ code, you can do it [here]({})".format(
-            _config.GITHUB_LINK),
+            config.GITHUB_LINK),
         'about_inv_link': ":u6708: Linguistic lot",
         'about_inv_desc': "Here's an [invite link]({}) for you, if you want to join our server".format(
-            _config.INV_LINK)  # TODO: Prolly needs changing, but not now
+            config.INV_LINK)  # TODO: Prolly needs changing, but not now
     },
 
     # Text lines for ;version command

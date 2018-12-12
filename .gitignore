@@ -1,5 +1,6 @@
-.idea/
+/.idea/
 /__pycache__
 /venv
-_config.py
+/settings/config.py
 discord.log
+*.pyc
