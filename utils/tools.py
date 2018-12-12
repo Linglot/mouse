@@ -18,6 +18,12 @@ def get_original_name(name):
 def can_edit_channel(bot, channel):
     return channel.permissions_for(channel.server.get_member(bot.user.id)).manage_channels
 
+# Return true if given user in VC
+def user_in_vc(user, vc):
+    if user is None or vc is None:
+        return False
+    return True
+
 
 # Divides list into N evenly-sized chunks
 def create_chunks(list_to_divide, number_of_chunks):

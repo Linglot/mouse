@@ -1,1 +1,1 @@
-__all__ = ['about', 'voice', 'combine_search', 'reset_vc_name', 'version']
+__all__ = ['info', 'roles', 'voice']

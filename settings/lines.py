@@ -48,11 +48,11 @@ text_lines = {
         'about_desc': "Heyo! This bot was developed specially for the Linglot server. " \
                       "If you have any suggestions or bug reports, please contact the server staff.",
         'about_gh_link': ":notepad_spiral: Github",
-        'about_gh_desc': "If you want to help us with our bot, or just look at our ~~crappy~~ code, you can do it [here]({})".format(
-            config.GITHUB_LINK),
+        'about_gh_desc': "If you want to help us with our bot, or just look at our ~~crappy~~ code, you can do it [here]({})"
+            .format(config.GITHUB_LINK),
         'about_inv_link': ":u6708: Linguistic lot",
-        'about_inv_desc': "Here's an [invite link]({}) for you, if you want to join our server".format(
-            config.INV_LINK)  # TODO: Prolly needs changing, but not now
+        'about_inv_desc': "Here's an [invite link]({}) for you, if you want to join our server"
+            .format(config.INV_LINK)
     },
 
     # Text lines for ;version command

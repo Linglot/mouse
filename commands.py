@@ -11,33 +11,53 @@ class ChatCommands:
     # Syntax: ;lang Language Name
     @commands.command(aliases=["lang", "l"], pass_context=True)
     async def language(self, ctx, *args):
-        await voice.change_vc_name(self.bot, ctx, args)
+        user = ctx.message.author
+        channel = ctx.message.channel
+        vc = ctx.message.author.voice.voice_channel
 
-    # TODO: Remove code duplication with VC behaviour's function
+        # Since we get out name as an array of strings, we should connect 'em
+        # ["lol","qwe"] -> "lol qwe"
+        lang_name = " ".join(args)
+
+        await voice.change_vc_name(self.bot, user, channel, vc, lang_name)
+
     # Command for removing language name from VC's name
     # Syntax: ;resetlang
-    @commands.command(aliases=["resetlang", "rl"], pass_context=True)
+    @commands.command(aliases=["rl"], pass_context=True)
     async def resetlang(self, ctx):
-        await voice.reset_vc_name(self.bot, ctx)
+        user = ctx.message.author
+        channel = ctx.message.channel
+        vc = ctx.message.author.voice.voice_channel
+
+        await voice.reset_vc_name(self.bot, user, channel, vc)
 
     # Command for searching users who have multiple tags
-    # Syntax is: lang
-    @commands.command(aliases=["who", "inroles"], pass_context=True)
-    async def combine_search(self, ctx, *args):
-        await combine_search.combine_search(self.bot, ctx, args)
+    # Syntax is: ;who role1[, role2 ...]
+    @commands.command(aliases=["inroles"], pass_context=True)
+    async def who(self, ctx, *args):
+        server = ctx.message.server
+        channel = ctx.message.channel
 
-    # Simple bot-info command
-    # Shows discord invite link, git, and some bot-related info
-    # Syntax: ;about
-    @commands.command(aliases=["about", "info"], pass_context=True)
-    async def show_info(self, ctx):
-        await about.show_info(self.bot, ctx)
+        # Dividing roles to a list, removing unnecessary spaces and making it lowercase
+        # "  native english,    fluent english " -> ["native english", "fluent english"]
+        searching_roles = [role.strip().lower() for role in " ".join(args).split(",") if role.strip() != ""]
 
-    # Version command
-    # Syntax: ;version
-    @commands.command(aliases=["version", "ver"], pass_context=True)
-    async def show_version(self, ctx):
-        await version.show_version(self.bot, ctx)
+        await roles.role_search(self.bot, server, channel, searching_roles)
+
+
+# Simple bot-info command
+# Shows discord invite link, git, and some bot-related info
+# Syntax: ;about
+@commands.command(aliases=["info"], pass_context=True)
+async def about(self, ctx):
+    await info.show_about(self.bot, ctx.message.channel)
+
+
+# Version command
+# Syntax: ;version
+@commands.command(aliases=["ver"], pass_context=True)
+async def version(self, ctx):
+    await info.show_version(self.bot, ctx.message.channel)
 
 
 def setup(bot):

@@ -4,18 +4,14 @@ from utils.tools import *
 
 
 # Command for searching users who have multiple tags
-async def combine_search(bot, ctx, *args):
-    server = ctx.message.server
+async def role_search(bot, server, channel, searching_roles):
     found_users = []
-
-    # Dividing roles to a list, removing unnecessary spaces and making it lowercase
-    searching_roles = [role.strip().lower() for role in " ".join(args).split(",") if role.strip() != ""]
 
     # You can use use nadeko's .inrole, if you want to get 1 role only
     if len(searching_roles) < 2 or len(searching_roles) > settings['combined_search']['role_limit']:
         embed = error_embed(text_lines['combined_search']['min_max_roles_amount'].format(
             str(settings['combined_search']['role_limit'])))
-        await bot.send_message(ctx.message.channel, embed=embed)
+        await bot.send_message(channel, embed=embed)
         return
 
     # Do these roles even exist?
@@ -24,7 +20,7 @@ async def combine_search(bot, ctx, *args):
         # If at least one doesn't = rip
         if role not in server_roles:
             embed = error_embed(text_lines['combined_search']['no_such_role'].format(role.title()))
-            await bot.send_message(ctx.message.channel, embed=embed)
+            await bot.send_message(channel, embed=embed)
             return
 
     # Looking for peeps
@@ -40,7 +36,7 @@ async def combine_search(bot, ctx, *args):
                                    description=text_lines['combined_search']['try_another_one'],
                                    colour=discord.Colour(MAIN_COLOR))
 
-        await bot.send_message(ctx.message.channel, embed=no_results)
+        await bot.send_message(channel, embed=no_results)
         return
 
     # Making the title string ready
@@ -85,4 +81,4 @@ async def combine_search(bot, ctx, *args):
             ]
             embed.add_field(name=header, value='\n'.join(row_users_list), inline=True)
 
-    await bot.send_message(ctx.message.channel, embed=embed)
+    await bot.send_message(channel, embed=embed)
