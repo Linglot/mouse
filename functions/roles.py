@@ -82,3 +82,41 @@ async def role_search(bot, server, channel, searching_roles):
             embed.add_field(name=header, value='\n'.join(row_users_list), inline=True)
 
     await bot.send_message(channel, embed=embed)
+
+
+# Command for searching users who have multiple tags
+async def role_count(bot, server, channel, searching_roles):
+    counter = 0
+
+    # No or too many roles given equals "Bye"
+    if len(searching_roles) < 1 or len(searching_roles) > settings['combined_search']['role_limit']:
+        embed = error_embed(text_lines['combined_search']['min_max_roles_amount'].format(
+            str(settings['combined_search']['role_limit'])))
+        await bot.send_message(channel, embed=embed)
+        return
+
+    # Do these roles even exist?
+    server_roles = [role.name.lower() for role in server.roles]
+    for role in searching_roles:
+        # If at least one doesn't = rip
+        if role not in server_roles:
+            embed = error_embed(text_lines['combined_search']['no_such_role'].format(role.title()))
+            await bot.send_message(channel, embed=embed)
+            return
+
+    # Looking for peeps
+    for member in server.members:
+        user_roles = [str(role).lower() for role in member.roles]
+        if set(searching_roles).issubset(user_roles):
+            counter += 1
+
+    # If the result is 0 peeps, we have to show that
+    roles = ", ".join([role.title() for role in searching_roles])
+    if counter == 1:
+        embed = discord.Embed(description=text_lines['role_count']['one_user_found'].format(roles),
+                              colour=discord.Colour(MAIN_COLOR))
+    else:
+        title = text_lines['role_count']['x_users_found'].format(counter, roles)
+        embed = discord.Embed(description=title, colour=discord.Colour(MAIN_COLOR))
+
+    await bot.send_message(channel, embed=embed)

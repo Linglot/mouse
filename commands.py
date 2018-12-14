@@ -34,7 +34,7 @@ class ChatCommands:
 
     # Command for searching users who have multiple tags
     # Syntax is: ;who role1[, role2 ...]
-    @commands.command(aliases=["inroles"], pass_context=True)
+    @commands.command(aliases=["inrole", "inroles"], pass_context=True)
     async def who(self, ctx, *args):
         server = ctx.message.server
         channel = ctx.message.channel
@@ -42,20 +42,26 @@ class ChatCommands:
 
         await roles.role_search(self.bot, server, channel, searching_roles)
 
+    @commands.command(pass_context=True)
+    async def count(self, ctx, *args):
+        server = ctx.message.server
+        channel = ctx.message.channel
+        searching_roles = make_role_list(args)
 
-# Simple bot-info command
-# Shows discord invite link, git, and some bot-related info
-# Syntax: ;about
-@commands.command(aliases=["info"], pass_context=True)
-async def about(self, ctx):
-    await info.show_about(self.bot, ctx.message.channel)
+        await roles.role_count(self.bot, server, channel, searching_roles)
 
+    # Simple bot-info command
+    # Shows discord invite link, git, and some bot-related info
+    # Syntax: ;about
+    @commands.command(aliases=["info"], pass_context=True)
+    async def about(self, ctx):
+        await info.show_about(self.bot, ctx.message.channel)
 
-# Version command
-# Syntax: ;version
-@commands.command(aliases=["ver"], pass_context=True)
-async def version(self, ctx):
-    await info.show_version(self.bot, ctx.message.channel)
+    # Version command
+    # Syntax: ;version
+    @commands.command(aliases=["ver"], pass_context=True)
+    async def version(self, ctx):
+        await info.show_version(self.bot, ctx.message.channel)
 
 
 def setup(bot):

@@ -6,7 +6,6 @@ After each line with a placeholder there's a comment with its "future" content.
 from settings import config
 
 text_lines = {
-
     # Text lines for ;lang and ;resetlang functions
     'voice_channel_language': {
         'lang_if_nothing': [
@@ -43,12 +42,18 @@ text_lines = {
         # 'row_1_column_only': "Results are: ",  # when <6 results, this text is shown instead of 'row_1_column"
     },
 
+    'role_count': {
+        "one_user_found": "**1** user was found for: {}",  # Role list
+        "x_users_found": "**{}** users were found for: {}"  # Number of users, Role list
+    },
+
     # Text lines for ;info command
     'about': {
-        'about_desc': "Heyo! This bot was developed specially for the Linglot server. " \
+        'about_desc': "Heyo! This bot was developed specially for the Linglot server. "
                       "If you have any suggestions or bug reports, please contact the server staff.",
         'about_gh_link': ":notepad_spiral: Github",
-        'about_gh_desc': "If you want to help us with our bot, or just look at our ~~crappy~~ code, you can do it [here]({})"
+        'about_gh_desc': "If you want to help us with our bot, or just look at our ~~crappy~~ code,"
+                         "you can do it [here]({})"
             .format(config.GITHUB_LINK),
         'about_inv_link': ":u6708: Linguistic lot",
         'about_inv_desc': "Here's an [invite link]({}) for you, if you want to join our server"
