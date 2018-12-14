@@ -18,7 +18,7 @@ class ChatCommands:
 
         # Since we get out name as an array of strings, we should connect 'em
         # ["lol","qwe"] -> "lol qwe"
-        lang_name = " ".join(args)
+        lang_name = " ".join(args).title()
 
         await voice.change_vc_name(self.bot, user, channel, vc, lang_name)
 
