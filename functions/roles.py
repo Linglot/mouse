@@ -85,6 +85,7 @@ async def role_search(bot, server, channel, searching_roles):
 
 
 # Command for searching users who have multiple tags
+# TODO: Remove code duplication in this in ;who
 async def role_count(bot, server, channel, searching_roles):
     counter = 0
 
