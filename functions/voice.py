@@ -27,8 +27,7 @@ async def change_vc_name(bot, user, channel, vc, lang_name):
 
     # If we get "reset" then we're going to use another function
     if lang_name.strip() == "reset":
-        # TODO make this gre..work again
-        # await reset_lang.callback(self, ctx)
+        await reset_vc_name(bot, user, channel, vc)
         return
 
     # I wish my iq were that big (20 chars max length)

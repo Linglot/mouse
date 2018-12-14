@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 import discord
 
 from settings.config import VOICE_CHANNEL_DIVIDER, SECONDARY_COLOR, OFF_COLOR_3
@@ -17,6 +19,7 @@ def get_original_name(name):
 # Return true if the bot has "manage channel" permission, otherwise false
 def can_edit_channel(bot, channel):
     return channel.permissions_for(channel.server.get_member(bot.user.id)).manage_channels
+
 
 # Return true if given user in VC
 def user_in_vc(user, vc):
@@ -45,3 +48,10 @@ def error_embed(message):
 def info_embed(message):
     embed = discord.Embed(description=message, colour=discord.Colour(OFF_COLOR_3))
     return embed
+
+
+def make_role_list(input_str):
+    # Dividing roles to a list, removing unnecessary spaces and making it lowercase
+    # "  native english,    fluent english " -> ["native english", "fluent english"]
+    result = [role.strip().lower() for role in " ".join(input_str).split(",") if role.strip() != ""]
+    return list(OrderedDict.fromkeys(result))
