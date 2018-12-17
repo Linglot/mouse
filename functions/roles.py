@@ -3,6 +3,8 @@ from settings.lines import text_lines
 from utils.tools import *
 
 
+# TODO: LONG ONE, REWRITE TO CLASSES SO I COULD USE PRIVATE METHODS
+
 # Command for searching users who have multiple tags
 async def role_search(bot, server, channel, searching_roles):
     found_users = []
@@ -87,8 +89,6 @@ async def role_search(bot, server, channel, searching_roles):
 # Command for searching users who have multiple tags
 # TODO: Remove code duplication in this in ;who
 async def role_count(bot, server, channel, searching_roles):
-    counter = 0
-
     # No or too many roles given equals "Bye"
     if len(searching_roles) < 1 or len(searching_roles) > settings['combined_search']['role_limit']:
         embed = error_embed(text_lines['combined_search']['min_max_roles_amount'].format(
@@ -105,19 +105,26 @@ async def role_count(bot, server, channel, searching_roles):
             await bot.send_message(channel, embed=embed)
             return
 
-    # Looking for peeps
-    for member in server.members:
-        user_roles = [str(role).lower() for role in member.roles]
-        if set(searching_roles).issubset(user_roles):
-            counter += 1
+    # String var we're going to fill now and use later.
+    description_line = ""
+    total_users = 0
 
-    # If the result is 0 peeps, we have to show that
+    # Looking for peeps
+    for role in searching_roles:
+        cur_res = 0
+        for member in server.members:
+            user_roles = [str(role).lower() for role in member.roles]
+            if role in user_roles:
+                cur_res += 1
+
+        # Forming a line for results
+        description_line += text_lines['role_count']['total_in_role'].format(role.title(), cur_res)
+        total_users += cur_res
+
     roles = ", ".join([role.title() for role in searching_roles])
-    if counter == 1:
-        embed = discord.Embed(description=text_lines['role_count']['one_user_found'].format(roles),
-                              colour=discord.Colour(MAIN_COLOR))
-    else:
-        title = text_lines['role_count']['x_users_found'].format(counter, roles)
-        embed = discord.Embed(description=title, colour=discord.Colour(MAIN_COLOR))
+
+    embed = discord.Embed(title=text_lines['role_count']['x_number_of_users'].format(total_users, roles),
+                          description=description_line,
+                          colour=discord.Colour(MAIN_COLOR))
 
     await bot.send_message(channel, embed=embed)

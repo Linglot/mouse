@@ -42,6 +42,8 @@ class ChatCommands:
 
         await roles.role_search(self.bot, server, channel, searching_roles)
 
+    # Command for counting up users in following roles
+    # Syntax is: ;count role1[, role2 ...]
     @commands.command(pass_context=True)
     async def count(self, ctx, *args):
         server = ctx.message.server

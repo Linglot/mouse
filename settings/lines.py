@@ -43,8 +43,8 @@ text_lines = {
     },
 
     'role_count': {
-        "one_user_found": "**1** user was found for: {}",  # Role list
-        "x_users_found": "**{}** users were found for: {}"  # Number of users, Role list
+        "x_number_of_users": "{} users match following combination: {}",  # Total umber of users, Role list
+        "total_in_role": "Total in **{}**: **{}**\n"  # Role name, Number of users
     },
 
     # Text lines for ;info command
