@@ -3,7 +3,7 @@ from settings.lines import text_lines
 from utils.tools import *
 
 
-# TODO: LONG ONE, REWRITE TO CLASSES SO I COULD USE PRIVATE METHODS
+# TODO: This whole code needs reviewing and refactoring in the future.
 
 # Command for searching users who have multiple tags
 async def role_search(bot, server, channel, searching_roles):
@@ -107,7 +107,13 @@ async def role_count(bot, server, channel, searching_roles):
 
     # String var we're going to fill now and use later.
     description_line = ""
-    total_users = 0
+    users_in_combination = 0
+
+    # Counting the combination of peeps
+    for member in server.members:
+        user_roles = [str(role).lower() for role in member.roles]
+        if set(searching_roles).issubset(user_roles):
+            users_in_combination += 1
 
     # Looking for peeps
     for role in searching_roles:
@@ -119,12 +125,22 @@ async def role_count(bot, server, channel, searching_roles):
 
         # Forming a line for results
         description_line += text_lines['role_count']['total_in_role'].format(role.title(), cur_res)
-        total_users += cur_res
 
     roles = ", ".join([role.title() for role in searching_roles])
 
-    embed = discord.Embed(title=text_lines['role_count']['x_number_of_users'].format(total_users, roles),
-                          description=description_line,
-                          colour=discord.Colour(MAIN_COLOR))
+    if users_in_combination <= 0:
+        title = text_lines['role_count']['none_users_in_combination'].format(roles)
+    elif users_in_combination == 1:
+        title = text_lines['role_count']['one_user_in_combination'].format(roles)
+    else:
+        title = text_lines['role_count']['x_number_of_users'].format(users_in_combination, roles)
+
+    if len(searching_roles) > 1:
+        embed = discord.Embed(title=title,
+                              description=description_line,
+                              colour=discord.Colour(MAIN_COLOR))
+    else:
+        embed = discord.Embed(title=title,
+                              colour=discord.Colour(MAIN_COLOR))
 
     await bot.send_message(channel, embed=embed)

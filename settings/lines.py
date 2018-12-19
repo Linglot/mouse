@@ -43,7 +43,9 @@ text_lines = {
     },
 
     'role_count': {
-        "x_number_of_users": "{} users match following combination: {}",  # Total umber of users, Role list
+        "x_number_of_users": "{} users match the combination: {}",  # Total umber of users, Role list
+        "one_user_in_combination": "1 user match the combination: {}",  # Role list
+        "none_users_in_combination": "No users match the combination: {}",  # Role list
         "total_in_role": "Total in **{}**: **{}**\n"  # Role name, Number of users
     },
 

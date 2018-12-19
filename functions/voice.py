@@ -37,9 +37,9 @@ async def change_vc_name(bot, user, channel, vc, lang_name):
         return
 
     # If the name could be split (or had been changed in the past, in other words)
-    # when we just need to change the last part
+    # then we just need to change the last part
     if splittable(vc.name):
-        # This is poop code right there
+        # This is poop code right here
         # TODO: rewrite, but later
         await bot.edit_channel(vc, name="{} {} {}".format(get_original_name(vc.name), VOICE_CHANNEL_DIVIDER,
                                                           lang_name))
@@ -74,3 +74,4 @@ async def reset_vc_name(bot, user, channel, vc):
 async def _reset_channel_name(bot, vc):
     oc_name = get_original_name(vc.name)
     await bot.edit_channel(vc, name=oc_name)
+    return True
