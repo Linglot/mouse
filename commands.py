@@ -52,6 +52,16 @@ class ChatCommands:
 
         await roles.role_count(self.bot, server, channel, searching_roles)
 
+    # Command for pinging roles
+    # Syntax is: ;ping
+    @commands.command(aliases=["mention"], pass_context=True)
+    async def ping(self, ctx, *args):
+        server = ctx.message.server
+        channel = ctx.message.channel
+        pinging_roles = make_role_list(args)
+
+        await roles.ping(self.bot, server, channel, pinging_roles)
+
     # Simple bot-info command
     # Shows discord invite link, git, and some bot-related info
     # Syntax: ;about

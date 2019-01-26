@@ -144,3 +144,30 @@ async def role_count(bot, server, channel, searching_roles):
                               colour=discord.Colour(MAIN_COLOR))
 
     await bot.send_message(channel, embed=embed)
+
+async def ping(bot, server, channel, roles_to_ping):
+    # 0 or too many roles = Bye
+    if len(roles_to_ping) < 1 or len(roles_to_ping) > settings['combined_search']['role_limit']:
+        embed = error_embed(text_lines['mention']['min_max_roles_amount'].format(
+            str(settings['combined_search']['role_limit'])))
+        await bot.send_message(channel, embed=embed)
+        return
+
+    # Do these roles even exist?
+    server_roles = [role.name.lower() for role in server.roles]
+    for role in roles_to_ping:
+        # If at least one doesn't = rip
+        if role not in server_roles:
+            embed = error_embed(text_lines['combined_search']['no_such_role'].format(role.title()))
+            await bot.send_message(channel, embed=embed)
+            return
+
+    for role in roles_to_ping:
+        current_role = discord.utils.get(server.roles, name=role)
+        await bot.edit_role(server=server, role=current_role, mentionable=True)
+        await bot.send_message(channel, content="{}".format(current_role.mention))
+        await bot.edit_role(server=server, role=current_role, mentionable=False)
+        await bot.send_message(channel, content="done")
+        #for lmao in iter(role.permissions):
+        #    print(lmao)
+    #await bot.send_message(channel, embed=embed)

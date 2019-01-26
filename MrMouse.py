@@ -4,7 +4,7 @@ from settings.config import TOKEN, PREFIX
 
 bot = Bot(command_prefix=PREFIX)
 
-modules = ['commands', 'events']
+modules = ['commands']#, 'events']
 
 
 @bot.event
@@ -25,3 +25,4 @@ if __name__ == "__main__":
         print("Extensions: {} module was loaded.".format(extension))
 
 bot.run(TOKEN)
+#bot.run(TOKEN_SERVER)

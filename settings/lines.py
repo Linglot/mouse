@@ -49,6 +49,13 @@ text_lines = {
         "total_in_role": "Total in **{}**: **{}**\n"  # Role name, Number of users
     },
 
+    'mention': {
+        'min_max_roles_amount': "You have to choose for at least 1 role and a maximum of {}",  # Number of maximum roles
+        "one_user_in_combination": "1 user match the combination: {}",  # Role list
+        "none_users_in_combination": "No users match the combination: {}",  # Role list
+        "total_in_role": "Total in **{}**: **{}**\n"  # Role name, Number of users
+    },
+
     # Text lines for ;info command
     'about': {
         'about_desc': "Heyo! This bot was developed specially for the Linglot server. "
