@@ -42,6 +42,7 @@ text_lines = {
         # 'row_1_column_only': "Results are: ",  # when <6 results, this text is shown instead of 'row_1_column"
     },
 
+    # ;lines
     'role_count': {
         "x_number_of_users": "{} users match the combination: {}",  # Total umber of users, Role list
         "one_user_in_combination": "1 user match the combination: {}",  # Role list
@@ -49,11 +50,11 @@ text_lines = {
         "total_in_role": "Total in **{}**: **{}**\n"  # Role name, Number of users
     },
 
+    #;ping
     'mention': {
         'min_max_roles_amount': "You have to choose for at least 1 role and a maximum of {}",  # Number of maximum roles
-        "one_user_in_combination": "1 user match the combination: {}",  # Role list
-        "none_users_in_combination": "No users match the combination: {}",  # Role list
-        "total_in_role": "Total in **{}**: **{}**\n"  # Role name, Number of users
+        "cant_ping_here_and_everyone": "You can't ping `here` nor `everyone`",
+        "message": "Hey {}", # Pings
     },
 
     # Text lines for ;info command

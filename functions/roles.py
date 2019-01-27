@@ -145,11 +145,19 @@ async def role_count(bot, server, channel, searching_roles):
 
     await bot.send_message(channel, embed=embed)
 
+
 async def ping(bot, server, channel, roles_to_ping):
     # 0 or too many roles = Bye
     if len(roles_to_ping) < 1 or len(roles_to_ping) > settings['combined_search']['role_limit']:
         embed = error_embed(text_lines['mention']['min_max_roles_amount'].format(
             str(settings['combined_search']['role_limit'])))
+        await bot.send_message(channel, embed=embed)
+        return
+
+    # You shouldn't be able to ping everyone and here
+    not_allowed = ['here', 'everyone']
+    if any(i in not_allowed for i in roles_to_ping):
+        embed = error_embed(text_lines['mention']['cant_ping_here_and_everyone'])
         await bot.send_message(channel, embed=embed)
         return
 
@@ -162,12 +170,22 @@ async def ping(bot, server, channel, roles_to_ping):
             await bot.send_message(channel, embed=embed)
             return
 
+    message = []
+    gotta_change_later = []
+
+    # Making some roles pingable and making a ping message
     for role in roles_to_ping:
         current_role = discord.utils.get(server.roles, name=role)
-        await bot.edit_role(server=server, role=current_role, mentionable=True)
-        await bot.send_message(channel, content="{}".format(current_role.mention))
+        if not current_role.mentionable:
+            await bot.edit_role(server=server, role=current_role, mentionable=True)
+            gotta_change_later.append(role)
+        message.append(current_role.mention)
+
+    # Sending the ping message
+    line = ", ".join(message)
+    await bot.send_message(channel, content=text_lines['mention']['message'].format(line))
+
+    # We gotta change back some of roles to unpingable
+    for role in gotta_change_later:
+        current_role = discord.utils.get(server.roles, name=role)
         await bot.edit_role(server=server, role=current_role, mentionable=False)
-        await bot.send_message(channel, content="done")
-        #for lmao in iter(role.permissions):
-        #    print(lmao)
-    #await bot.send_message(channel, embed=embed)
