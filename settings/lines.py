@@ -50,11 +50,15 @@ text_lines = {
         "total_in_role": "Total in **{}**: **{}**\n"  # Role name, Number of users
     },
 
-    #;ping
+    # ;ping
     'mention': {
         'min_max_roles_amount': "You have to choose for at least 1 role and a maximum of {}",  # Number of maximum roles
         "cant_ping_here_and_everyone": "You can't ping `here` nor `everyone`",
-        "message": "Hey {}", # Pings
+        "message": "Hey {}",  # Pings
+
+        # Errors
+        "slow_down_m": "You can't ping again for {} minutes",  # Minutes
+        "slow_down_s": "You can't ping again for {} seconds",  # Seconds
     },
 
     # Text lines for ;info command
@@ -74,5 +78,9 @@ text_lines = {
     'version': {
         'version_currently': "Current version is {}!",  # Version number
         'version_footer': "Sincerely yours, {}"  # Bot's name
+    },
+
+    'technical': {
+        'unknown_error': "An unknown error has happened, pls let Bot Devs know about this"
     }
 }

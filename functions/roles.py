@@ -175,7 +175,7 @@ async def ping(bot, server, channel, roles_to_ping):
 
     # Making some roles pingable and making a ping message
     for role in roles_to_ping:
-        current_role = discord.utils.get(server.roles, name=role)
+        current_role = get_role(server, role)
         if not current_role.mentionable:
             await bot.edit_role(server=server, role=current_role, mentionable=True)
             gotta_change_later.append(role)
@@ -187,5 +187,5 @@ async def ping(bot, server, channel, roles_to_ping):
 
     # We gotta change back some of roles to unpingable
     for role in gotta_change_later:
-        current_role = discord.utils.get(server.roles, name=role)
+        current_role = get_role(server, role)
         await bot.edit_role(server=server, role=current_role, mentionable=False)

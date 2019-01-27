@@ -1,10 +1,10 @@
 from discord.ext.commands import Bot
 
-from settings.config import TOKEN, PREFIX
+from settings.config import TOKEN, PREFIX, TOKEN_SERVER
 
 bot = Bot(command_prefix=PREFIX)
 
-modules = ['commands']#, 'events']
+modules = ['commands', 'events']
 
 
 @bot.event
@@ -24,5 +24,5 @@ if __name__ == "__main__":
         bot.load_extension(extension)
         print("Extensions: {} module was loaded.".format(extension))
 
-bot.run(TOKEN)
-#bot.run(TOKEN_SERVER)
+#bot.run(TOKEN)
+bot.run(TOKEN_SERVER)

@@ -55,3 +55,7 @@ def make_role_list(input_str):
     # "  native english,    fluent english " -> ["native english", "fluent english"]
     result = [role.strip().lower() for role in " ".join(input_str).split(",") if role.strip() != ""]
     return list(OrderedDict.fromkeys(result))
+
+
+def get_role(server, role_name):
+    return discord.utils.find(lambda m: m.name.lower() == role_name.lower(), server.roles)

@@ -1,6 +1,7 @@
 from discord.ext import commands
 
 from functions import *
+from settings.config import settings
 from utils.tools import make_role_list
 
 
@@ -55,6 +56,8 @@ class ChatCommands:
     # Command for pinging roles
     # Syntax is: ;ping
     @commands.command(aliases=["mention"], pass_context=True)
+    @commands.has_any_role(*settings['ping']['allowed_roles'])
+    @commands.cooldown(rate=1, per=settings['ping']['cooldown'], type=commands.BucketType.user)
     async def ping(self, ctx, *args):
         server = ctx.message.server
         channel = ctx.message.channel
