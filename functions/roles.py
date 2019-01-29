@@ -87,7 +87,6 @@ async def role_search(bot, server, channel, searching_roles):
 
 
 # Command for searching users who have multiple tags
-# TODO: Remove code duplication in this in ;who
 async def role_count(bot, server, channel, searching_roles):
     # No or too many roles given equals "Bye"
     if len(searching_roles) < 1 or len(searching_roles) > settings['combined_search']['role_limit']:
@@ -145,7 +144,7 @@ async def role_count(bot, server, channel, searching_roles):
 
     await bot.send_message(channel, embed=embed)
 
-
+# Command for pinging peeps
 async def ping(bot, server, channel, roles_to_ping):
     # 0 or too many roles = Bye
     if len(roles_to_ping) < 1 or len(roles_to_ping) > settings['combined_search']['role_limit']:
@@ -155,11 +154,12 @@ async def ping(bot, server, channel, roles_to_ping):
         return
 
     # You shouldn't be able to ping everyone and here
-    not_allowed = ['here', 'everyone']
-    if any(i in not_allowed for i in roles_to_ping):
-        embed = error_embed(text_lines['mention']['cant_ping_here_and_everyone'])
-        await bot.send_message(channel, embed=embed)
-        return
+    for blacklist_item in settings['ping']['unpingable_roles']:
+        item = blacklist_item.lower()
+        if item in roles_to_ping:
+            embed = error_embed(text_lines['mention']['cant_ping_X'].format(blacklist_item))
+            await bot.send_message(channel, embed=embed)
+            return
 
     # Do these roles even exist?
     server_roles = [role.name.lower() for role in server.roles]

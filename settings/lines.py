@@ -53,12 +53,13 @@ text_lines = {
     # ;ping
     'mention': {
         'min_max_roles_amount': "You have to choose for at least 1 role and a maximum of {}",  # Number of maximum roles
-        "cant_ping_here_and_everyone": "You can't ping `here` nor `everyone`",
+        "cant_ping_X": "You can't ping `{}`", # Role name
         "message": "Hey {}",  # Pings
 
         # Errors
         "slow_down_m": "You can't ping again for {} minutes",  # Minutes
         "slow_down_s": "You can't ping again for {} seconds",  # Seconds
+        "no_access": "You don't have the permissions to this command"
     },
 
     # Text lines for ;info command

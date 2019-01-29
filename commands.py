@@ -56,7 +56,7 @@ class ChatCommands:
     # Command for pinging roles
     # Syntax is: ;ping
     @commands.command(aliases=["mention"], pass_context=True)
-    @commands.has_any_role(*settings['ping']['allowed_roles'])
+    @commands.has_any_role(*settings['ping']['roles_allowed_to_ping'])
     @commands.cooldown(rate=1, per=settings['ping']['cooldown'], type=commands.BucketType.user)
     async def ping(self, ctx, *args):
         server = ctx.message.server

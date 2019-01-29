@@ -2,7 +2,7 @@
 TOKEN = "........"
 
 # Technically does nothing
-CURRENT_VERSION = "0.1.4"
+CURRENT_VERSION = "0.1.5"
 
 # Commands prefix
 PREFIX = ';'
@@ -22,6 +22,11 @@ settings = {
     'combined_search': {  # Restriction for combined search
         'role_limit': 4,  # The number of maximum combination of roles in 1 query
         'max_user_name_length': 20  # If the name longer than this, it gets cut off
+    },
+    'ping': {
+        'roles_allowed_to_ping': ['Admin', 'Moderator', 'Event host'],
+        'unpingable_roles': ['here', 'everyone', 'Lounge', 'Lurker', 'Event host', 'Correct me!', 'Warning'],
+        'cooldown': 15 * 60  # in seconds. 15 mins
     }
 }
 

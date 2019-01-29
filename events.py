@@ -27,14 +27,16 @@ class Events:
     async def on_command_error(self, exception, ctx):
         # Some of the imports are here because we only need them in this function
         from math import ceil
-        from discord.ext.commands import CommandOnCooldown
-
+        from discord.ext.commands import CommandOnCooldown, CheckFailure
         if isinstance(exception, CommandOnCooldown):
             seconds = exception.retry_after
             if seconds > 60:
                 embed = error_embed(text_lines['mention']['slow_down_m'].format(ceil(seconds / 60)))
             else:
                 embed = error_embed(text_lines['mention']['slow_down_s'].format(seconds))
+            await self.bot.send_message(ctx.message.channel, embed=embed)
+        elif isinstance(exception, CheckFailure):
+            embed = error_embed(text_lines['mention']['no_access'])
             await self.bot.send_message(ctx.message.channel, embed=embed)
         else:
             embed = error_embed(text_lines['technical']['unknown_error'])
