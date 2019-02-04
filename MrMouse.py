@@ -1,6 +1,6 @@
 from discord.ext.commands import Bot
 
-from settings.config import TOKEN, PREFIX
+from settings.config import TOKEN, PREFIX, TOKEN_SERVER
 
 bot = Bot(command_prefix=PREFIX)
 

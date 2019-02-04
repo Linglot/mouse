@@ -44,6 +44,7 @@ class Events:
             pass
         else:
             embed = error_embed(text_lines['technical']['unknown_error'])
+            print(exception)
             await self.bot.send_message(ctx.message.channel, embed=embed)
 
 

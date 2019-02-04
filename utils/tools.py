@@ -2,11 +2,14 @@ from collections import OrderedDict
 
 import discord
 
-from settings.config import VOICE_CHANNEL_DIVIDER, SECONDARY_COLOR, OFF_COLOR_3
+from settings.config import VOICE_CHANNEL_DIVIDER
 import more_itertools
 
 
 # If we get an array of 2 (or more, somehow) then it's splittable
+from settings.constants import INFO_COLOR, ERROR_COLOR
+
+
 def splittable(name):
     return len(name.split(" {} ".format(VOICE_CHANNEL_DIVIDER))) >= 2
 
@@ -41,12 +44,12 @@ def add_dots(string, limit):
 
 # Just a convenient way to make error and info boxes
 def error_embed(message):
-    embed = discord.Embed(description=message, colour=discord.Colour(SECONDARY_COLOR))
+    embed = discord.Embed(description=message, colour=discord.Colour(ERROR_COLOR))
     return embed
 
 
 def info_embed(message):
-    embed = discord.Embed(description=message, colour=discord.Colour(OFF_COLOR_3))
+    embed = discord.Embed(description=message, colour=discord.Colour(INFO_COLOR))
     return embed
 
 

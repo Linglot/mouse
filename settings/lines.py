@@ -3,7 +3,7 @@
 I.e. in "My name is {}" it gets changed automatically to user's name.
 After each line with a placeholder there's a comment with its "future" content.
 """
-from settings import config
+from settings.constants import GITHUB_LINK, INV_LINK
 
 text_lines = {
     # Text lines for ;lang and ;resetlang functions
@@ -53,13 +53,17 @@ text_lines = {
     # ;ping
     'mention': {
         'min_max_roles_amount': "You have to choose for at least 1 role and a maximum of {}",  # Number of maximum roles
-        "cant_ping_X": "You can't ping `{}`", # Role name
+        "cant_ping_X": "You can't ping `{}`",  # Role name
         "message": "Hey {}",  # Pings
 
         # Errors
         "slow_down_m": "You can't ping again for {} minutes",  # Minutes
         "slow_down_s": "You can't ping again for {} seconds",  # Seconds
         "no_access": "You don't have the permissions to this command"
+    },
+
+    'server_info': {
+        "lol": ""
     },
 
     # Text lines for ;info command
@@ -69,10 +73,10 @@ text_lines = {
         'about_gh_link': ":notepad_spiral: Github",
         'about_gh_desc': "If you want to help us with our bot, or just look at our ~~crappy~~ code,"
                          "you can do it [here]({})"
-            .format(config.GITHUB_LINK),
+            .format(GITHUB_LINK),
         'about_inv_link': ":u6708: Linguistic lot",
         'about_inv_desc': "Here's an [invite link]({}) for you, if you want to join our server"
-            .format(config.INV_LINK)
+            .format(INV_LINK)
     },
 
     # Text lines for ;version command
@@ -82,6 +86,6 @@ text_lines = {
     },
 
     'technical': {
-        'unknown_error': "An unknown error has happened, pls let Bot Devs know about this"
+        'unknown_error': "An unknown error has happened, pls report this to the bot devs. arigato"
     }
 }

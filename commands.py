@@ -2,6 +2,7 @@ from discord.ext import commands
 
 from functions import *
 from settings.config import settings
+from settings.constants import MOD_ROLES
 from utils.tools import make_role_list
 
 
@@ -64,6 +65,35 @@ class ChatCommands:
         pinging_roles = make_role_list(args)
 
         await roles.ping(self.bot, server, channel, pinging_roles)
+
+    # # Searches for roles with less than X members
+    # # Syntax: ;lessthan 10
+    # @commands.command(aliases=["lessthan", "less"], pass_context=True)
+    # @commands.has_any_role(*MOD_ROLES)
+    # async def less_than(self, ctx, *args):
+    #     server = ctx.message.server
+    #     channel = ctx.message.channel
+    #     x = int("".join(args))
+    #
+    #     await info.less_than(self.bot, server, channel, x)
+    #
+    # # Top 10 roles command
+    # # Syntax: ;top10
+    # @commands.command(aliases=["top"], pass_context=True)
+    # async def top10(self, ctx):
+    #     server = ctx.message.server
+    #     channel = ctx.message.channel
+    #
+    #     await info.top10(self.bot, server, channel)
+
+    # Server info command
+    # Syntax: ;si
+    @commands.command(aliases=["server_info", "server", "si"], pass_context=True)
+    async def serverinfo(self, ctx):
+        server = ctx.message.server
+        channel = ctx.message.channel
+
+        await info.server_info(self.bot, server, channel)
 
     # Simple bot-info command
     # Shows discord invite link, git, and some bot-related info

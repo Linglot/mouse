@@ -1,4 +1,5 @@
-from settings.config import MAIN_COLOR, settings
+from settings.config import settings
+from settings.constants import MAIN_COLOR
 from settings.lines import text_lines
 from utils.tools import *
 
