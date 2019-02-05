@@ -42,12 +42,12 @@ def add_dots(string, limit):
     return (string[:limit] + '…  ') if len(string) > limit else string
 
 
-# Just a convenient way to make error and info boxes
+# Just a convenient way to make error boxes
 def error_embed(message):
     embed = discord.Embed(description=message, colour=discord.Colour(ERROR_COLOR))
     return embed
 
-
+# Just a convenient way to make info boxes
 def info_embed(message):
     embed = discord.Embed(description=message, colour=discord.Colour(INFO_COLOR))
     return embed

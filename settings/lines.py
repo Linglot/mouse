@@ -85,7 +85,15 @@ text_lines = {
         'version_footer': "Sincerely yours, {}"  # Bot's name
     },
 
+    # Text lines for ;version command
+    'github': {
+        'github': "Github"
+    },
+
+    # Some lines for "oopsie" stuff
     'technical': {
-        'unknown_error': "An unknown error has happened, pls report this to the bot devs. arigato"
+        'forbidden': "I don't have access to write to #{} on {}", # Channel name, Server name
+        'unknown_error': "An unknown error has happened, pls report this line to the bot devs. arigato"
+                         "\n\n**Copy paste this**\n`{}`" # Error line
     }
 }

@@ -1,8 +1,7 @@
+from settings.constants import MOD_ROLES
+
 # You know what it is
 TOKEN = "........"
-
-# Technically does nothing
-CURRENT_VERSION = "0.1.5"
 
 # Commands prefix
 PREFIX = ';'
@@ -24,20 +23,8 @@ settings = {
         'max_user_name_length': 20  # If the name longer than this, it gets cut off
     },
     'ping': {
-        'roles_allowed_to_ping': ['Admin', 'Moderator', 'Event host'],
+        'roles_allowed_to_ping': [*MOD_ROLES, 'Event host'],
         'unpingable_roles': ['here', 'everyone', 'Lounge', 'Lurker', 'Event host', 'Correct me!', 'Warning'],
         'cooldown': 15 * 60  # in seconds. 15 mins
     }
 }
-
-""" All the constant below aren't really code related """
-
-# 0xRRGGBB aka HEX
-MAIN_COLOR = 0x091A4C
-SECONDARY_COLOR = 0xD86156
-OFF_COLOR_1 = 0xF2B53C
-OFF_COLOR_2 = 0x5F6662
-OFF_COLOR_3 = 0x3BCCB3
-
-GITHUB_LINK = "https://github.com/Linglot/mouse"
-INV_LINK = "https://discord.gg/uFWNUBQ"

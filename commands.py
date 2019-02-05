@@ -2,7 +2,6 @@ from discord.ext import commands
 
 from functions import *
 from settings.config import settings
-from settings.constants import MOD_ROLES
 from utils.tools import make_role_list
 
 
@@ -107,6 +106,12 @@ class ChatCommands:
     @commands.command(aliases=["ver"], pass_context=True)
     async def version(self, ctx):
         await info.show_version(self.bot, ctx.message.channel)
+
+    # Version command
+    # Syntax: ;version
+    @commands.command(aliases=["git"], pass_context=True)
+    async def github(self, ctx):
+        await info.github(self.bot, ctx.message.channel)
 
 
 def setup(bot):
