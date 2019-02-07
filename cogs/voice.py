@@ -69,7 +69,7 @@ async def reset_vc_name(bot, user, channel, vc):
         await bot.send_message(channel, embed=embed)
 
 
-# Used for removing code duplicating in reset VC's name functions
+# Used for removing code duplicating in reset VC's name cogs
 # Because we have one as a command and other as an event when channels gets empty
 async def _reset_channel_name(bot, vc):
     oc_name = get_original_name(vc.name)

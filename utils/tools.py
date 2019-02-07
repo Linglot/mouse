@@ -62,3 +62,6 @@ def make_role_list(input_str):
 
 def get_role(server, role_name):
     return discord.utils.find(lambda m: m.name.lower() == role_name.lower(), server.roles)
+
+def name(user):
+    return user.name + "#" + user.discriminator

@@ -1,6 +1,6 @@
 from discord.ext import commands
 
-from functions import *
+from cogs import *
 from settings.config import settings
 from utils.tools import make_role_list
 
@@ -76,43 +76,3 @@ class ChatCommands:
     #
     #     await info.less_than(self.bot, server, channel, x)
     #
-    # # Top 10 roles command
-    # # Syntax: ;top10
-    # @commands.command(aliases=["top"], pass_context=True)
-    # async def top10(self, ctx):
-    #     server = ctx.message.server
-    #     channel = ctx.message.channel
-    #
-    #     await info.top10(self.bot, server, channel)
-
-    # Server info command
-    # Syntax: ;si
-    @commands.command(aliases=["server_info", "server", "si"], pass_context=True)
-    async def serverinfo(self, ctx):
-        server = ctx.message.server
-        channel = ctx.message.channel
-
-        await info.server_info(self.bot, server, channel)
-
-    # Simple bot-info command
-    # Shows discord invite link, git, and some bot-related info
-    # Syntax: ;about
-    @commands.command(aliases=["info"], pass_context=True)
-    async def about(self, ctx):
-        await info.show_about(self.bot, ctx.message.channel)
-
-    # Version command
-    # Syntax: ;version
-    @commands.command(aliases=["ver"], pass_context=True)
-    async def version(self, ctx):
-        await info.show_version(self.bot, ctx.message.channel)
-
-    # Version command
-    # Syntax: ;version
-    @commands.command(aliases=["git"], pass_context=True)
-    async def github(self, ctx):
-        await info.github(self.bot, ctx.message.channel)
-
-
-def setup(bot):
-    bot.add_cog(ChatCommands(bot))
