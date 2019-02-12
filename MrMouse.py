@@ -7,12 +7,13 @@ bot = Bot(command_prefix=PREFIX)
 # initial_extensions = ['commands', 'events']
 extensions = [
     # Commands related
-    'cogs.info',
-    'cogs.voice',
+    #'cogs.info',
+    'cogs.roles',
+    #'cogs.voice',
 
     # Events
-    'events.events',
-    'events.on_error'
+    #'events.events',
+    #'events.on_error'
 ]
 
 
@@ -33,7 +34,7 @@ if __name__ == "__main__":
         bot.load_extension(extension)
         print("Extensions: {} module was loaded.".format(extension))
 
-bot.run(TOKEN, bot=True, reconnect=True, fetch_offline_members=True)
+bot.run(TOKEN_SERVER, bot=True, reconnect=True, fetch_offline_members=True)
 
 """
 https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be

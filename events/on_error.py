@@ -17,15 +17,15 @@ class OnError:
         if isinstance(exception, CommandOnCooldown):
             seconds = exception.retry_after
             if seconds > 60:
-                embed = error_embed(text_lines['mention']['slow_down_m'].format(ceil(seconds / 60)))
+                embed = error_embed(text_lines['roles']['ping']['slow_down_m'].format(ceil(seconds / 60)))
             else:
-                embed = error_embed(text_lines['mention']['slow_down_s'].format(seconds))
+                embed = error_embed(text_lines['roles']['ping']['slow_down_s'].format(seconds))
             await ctx.send(embed=embed)
         elif isinstance(exception, NoPrivateMessage):
             embed = error_embed(text_lines['technical']['cant_do_in_pm'])
             await ctx.send(embed=embed)
         elif isinstance(exception, CheckFailure):
-            embed = error_embed(text_lines['mention']['no_access'])
+            embed = error_embed(text_lines['roles']['ping']['no_access'])
             await ctx.send(embed=embed)
         elif isinstance(exception, CommandNotFound):
             return

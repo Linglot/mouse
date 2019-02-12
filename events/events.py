@@ -13,10 +13,8 @@ class Events:
         vc = before.channel
 
         # If user was in VC, we can edit this VC, there's no one in VC left and it was changed before
-        if vc is not None and \
-                VoiceCommands.can_edit(self.bot, vc) and \
-                len(vc.members) == 0 and VoiceCommands.splittable(vc.name):
-            # await _reset_channel_name(self.bot, vc)
+        if vc is not None and VoiceCommands.can_edit(vc) and len(vc.members) == 0 and VoiceCommands.splittable(vc.name):
+            await VoiceCommands.reset_name(vc)
             logger.info(text_lines['logging']['lang_removed'].format(vc.name))
 
     @staticmethod

@@ -9,56 +9,45 @@ text_lines = {
     ##############  IMPORTANT  ###############
     # Hierarchy: Cog (Class) -> Method -> Line
     'voice': {
-        'change':{
+        'change': {
             'must_be_in_vc': 'You must be in a voice channel',
-            'cant_edit': 'Can\'t edit that channel\'s name. ',
+            'cant_edit': 'Can\'t edit your channel\'s name. ',
             'empty': 'Please enter a language',
             'shorter': 'You could use name up to 20 symbols only',
             'done': 'Language set to {}',  # Language name
         },
-        'lang_were_reset': 'Channel name was reset to {}',  # Language name
+        'reset': 'Channel name was reset to {}',  # Language name
 
-        'format': '{} {} {}' # VC name, Divider, Language
+        'format': '{} {} {}'  # VC name, Divider, Language
     },
 
-    # Text lines for ;who command
-    'combined_search': {
-        'min_max_roles_amount': 'You have to search for at least 1 role and a maximum of {}',  # Number of maximum roles
-        'no_such_role': 'There\'s no **{}** role on the server',  # Role name
-        'no_users_found': 'No users were found',
-        'try_another_one': 'Maybe you should try another combination?',
-        'x_users_for': '{} users for: {}',  # Number of users, Role list
-        'one_user_for': '1 user for: {}',  # Role list
-        'one_user_column_header': 'The one and only',
-        'many_user_column_header': '{}-{}',  # Start number, End number
-        'and_many_more': 'And {} more…'  # A number of users
+    'roles': {
+        'search': {
+            'limit': 'You have to choose for at least 1 role and a maximum of {}',  # Number of maximum roles
+            'no_role': 'There\'s no **{}** role on the server',  # Role name
+            'no_users_title': 'No users were found',
+            'try_again': 'Maybe you should try another combination?',
+            'one_user': '1 user for: {}',  # Role list
+            'x_users': '{} users for: {}',  # Number of users, Role list
+            'one_user_header': 'The one and only',
+            'many_users_header': '{}-{}',  # Start number, End number
+            'and_more': 'And {} more…'  # A number of users
+        },
+        'count': {
+            'x_users': '{} users match the combination: {}',  # Total umber of users, Role list
+            'one_user': '1 user match the combination: {}',  # Role list
+            'no_users': 'No users match the combination: {}',  # Role list
+            'total': 'Total in {}: **{}**\n'  # Role name, Number of users
+        },
 
-        ### These are not in use for now ###
-        ####################################
-        # 'row_1_column': 'Total # of users',
-        # 'row_2_column'
-        # 'row_3_column': '☆',
-        # 'row_1_column_only': 'Results are: ',  # when <6 results, this text is shown instead of 'row_1_column'
-    },
+        'ping': {
+            'cant_ping': 'You can\'t ping `{}`',  # Role name
 
-    # ;lines
-    'role_count': {
-        'x_number_of_users': '{} users match the combination: {}',  # Total umber of users, Role list
-        'one_user_in_combination': '1 user match the combination: {}',  # Role list
-        'none_users_in_combination': 'No users match the combination: {}',  # Role list
-        'total_in_role': 'Total in **{}**: **{}**\n'  # Role name, Number of users
-    },
-
-    # ;ping
-    'mention': {
-        'min_max_roles_amount': 'You have to choose for at least 1 role and a maximum of {}',  # Number of maximum roles
-        'cant_ping_X': 'You can\'t ping `{}`',  # Role name
-        'message': 'Hey {}',  # Pings
-
-        # Errors
-        'slow_down_m': 'You can\'t ping again for {} minutes',  # Minutes
-        'slow_down_s': 'You can\'t ping again for {} seconds',  # Seconds
-        'no_access': 'You don\'t have the permissions to this command'
+            # Errors
+            'slow_down_m': 'You can\'t ping again for {} minutes',  # Minutes
+            'slow_down_s': 'You can\'t ping again for {} seconds',  # Seconds
+            'no_access': 'You don\'t have the permissions to this command'
+        },
     },
 
     'server_info': {
@@ -76,7 +65,7 @@ text_lines = {
         },
         'members_line': '{} Members, {} without any roles',  # In total, Without roles
         'x_roles': '{} roles',  # Number of roles
-        'channel_line': '{} Text, {} Voice' # Text channels, Voice channels
+        'channel_line': '{} Text, {} Voice'  # Text channels, Voice channels
     },
 
     # Text lines for ;info command

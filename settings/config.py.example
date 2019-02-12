@@ -15,16 +15,18 @@ settings = {
     'logging': {  # Settings for logging features
         'file_name': 'discord.log'
     },
-    'change_channel_lang': {  # Restriction for changing channel's language
-        'max_lang_name_length': 20
+    'roles':{
+        'search': {  # Restriction for combined search
+            'limit': 4,  # The number of maximum combination of roles in 1 query
+            'max_length': 20  # If the name longer than this, it gets cut off
+        },
+        'ping': {
+            'allowed': [*MOD_ROLES, 'Event host'],
+            'blacklist': ['here', 'everyone', 'Lounge', 'Lurker', 'Event host', 'Correct me!', 'Warning'],
+            'cooldown': 15 * 60  # in seconds. 15 mins
+        },
     },
-    'combined_search': {  # Restriction for combined search
-        'role_limit': 4,  # The number of maximum combination of roles in 1 query
-        'max_user_name_length': 20  # If the name longer than this, it gets cut off
+    'voice': {  # Restrictions for changing channel's language
+        'max_length': 20
     },
-    'ping': {
-        'roles_allowed_to_ping': [*MOD_ROLES, 'Event host'],
-        'unpingable_roles': ['here', 'everyone', 'Lounge', 'Lurker', 'Event host', 'Correct me!', 'Warning'],
-        'cooldown': 15 * 60  # in seconds. 15 mins
-    }
 }
