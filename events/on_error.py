@@ -4,7 +4,7 @@ from discord import Forbidden
 from discord.ext.commands import CommandOnCooldown, CheckFailure, NoPrivateMessage, CommandNotFound
 
 from settings.lines import text_lines
-from utils.tools import error_embed
+from utils.utils import error_embed
 
 
 class OnError:

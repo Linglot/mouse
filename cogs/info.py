@@ -5,7 +5,7 @@ from discord.ext import commands
 
 from settings.constants import CURRENT_VERSION, GITHUB_LINK, MAIN_COLOR
 from settings.lines import text_lines
-from utils.tools import *
+from utils.utils import *
 
 
 class InfoCommands:
@@ -25,6 +25,8 @@ class InfoCommands:
         role_dict = {}
         for role in server.roles:
             role_dict[role.name] = len(role.members)
+
+        # Larger ones first
         roles_sorted = sorted(role_dict.items(), reverse=True, key=operator.itemgetter(1))
 
         native = {}

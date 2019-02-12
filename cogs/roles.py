@@ -1,7 +1,7 @@
 from settings.config import settings
 from settings.constants import MAIN_COLOR
 from settings.lines import text_lines
-from utils.tools import *
+from utils.utils import *
 
 
 # TODO: This whole code needs reviewing and refactoring in the future.
@@ -190,3 +190,17 @@ async def ping(bot, server, channel, roles_to_ping):
     for role in gotta_change_later:
         current_role = get_role(server, role)
         await bot.edit_role(server=server, role=current_role, mentionable=False)
+
+
+    # # Searches for roles with less than X members
+    # # Syntax: ;lessthan 10
+    # TODO
+    # @commands.command(aliases=["lessthan", "less"], pass_context=True)
+    # @commands.has_any_role(*MOD_ROLES)
+    # async def less_than(self, ctx, *args):
+    #     server = ctx.message.server
+    #     channel = ctx.message.channel
+    #     x = int("".join(args))
+    #
+    #     await info.less_than(self.bot, server, channel, x)
+    #

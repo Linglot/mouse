@@ -8,10 +8,11 @@ bot = Bot(command_prefix=PREFIX)
 extensions = [
     # Commands related
     'cogs.info',
+    'cogs.voice',
 
     # Events
-    #'events.events',
-    #'events.on_error'
+    'events.events',
+    'events.on_error'
 ]
 
 
@@ -39,8 +40,6 @@ https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be
 https://discordpy.readthedocs.io/en/rewrite/ext/commands/api.html#context
 https://discordpy.readthedocs.io/en/rewrite/api.html#discord.Member
 
-make commands.py and events.py RIP
-move cogs and events to cogs
 do a mini refactor in utils
 
 """

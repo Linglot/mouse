@@ -2,7 +2,7 @@ from discord.ext import commands
 
 from cogs import *
 from settings.config import settings
-from utils.tools import make_role_list
+from utils.utils import make_role_list
 
 
 class ChatCommands:
@@ -65,14 +65,3 @@ class ChatCommands:
 
         await roles.ping(self.bot, server, channel, pinging_roles)
 
-    # # Searches for roles with less than X members
-    # # Syntax: ;lessthan 10
-    # @commands.command(aliases=["lessthan", "less"], pass_context=True)
-    # @commands.has_any_role(*MOD_ROLES)
-    # async def less_than(self, ctx, *args):
-    #     server = ctx.message.server
-    #     channel = ctx.message.channel
-    #     x = int("".join(args))
-    #
-    #     await info.less_than(self.bot, server, channel, x)
-    #
