@@ -43,7 +43,7 @@ class VoiceCommands:
             # This is poop code right here
             # TODO: rewrite, but later
             await vc.edit(name=text_lines['voice']['format'].format(
-                get_original_name(vc.name), VOICE_CHANNEL_DIVIDER, lang_name))
+                self.get_original_name(vc.name), VOICE_CHANNEL_DIVIDER, lang_name))
         # Otherwise add a suffix
         else:
             await vc.edit(name=text_lines['voice']['format'].format(
@@ -62,7 +62,7 @@ class VoiceCommands:
         if await self.__basic_checks(ctx):
             vc = ctx.author.voice.channel
             await self.reset_name(vc)
-            info = info_embed(text_lines['voice']['reset'].format(get_original_name(vc.name)))
+            info = info_embed(text_lines['voice']['reset'].format(self.get_original_name(vc.name)))
             await ctx.send(embed=info)
 
     # Basic checks, such as permissions
@@ -85,7 +85,7 @@ class VoiceCommands:
     # Because we have one as a command and other as an event when channels gets empty
     @staticmethod
     async def reset_name(vc):
-        oc_name = get_original_name(vc.name)
+        oc_name = VoiceCommands.get_original_name(vc.name)
         await vc.edit(name=oc_name)
         return True
 

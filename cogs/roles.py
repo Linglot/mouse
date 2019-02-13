@@ -264,7 +264,8 @@ class RoleCommands:
         return True
 
     # Divides list into N evenly-sized chunks
-    def __create_chunks(self, list_to_divide, number_of_chunks):
+    @classmethod
+    def __create_chunks(list_to_divide, number_of_chunks):
         return [list(c) for c in more_itertools.divide(number_of_chunks, list_to_divide)]
 
     # Static methods

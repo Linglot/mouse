@@ -1,9 +1,7 @@
-import operator
-
 from discord import TextChannel, VoiceChannel
 from discord.ext import commands
 
-from settings.constants import CURRENT_VERSION, GITHUB_LINK, MAIN_COLOR
+from settings.constants import CURRENT_VERSION, GITHUB_LINK
 from settings.lines import text_lines
 from utils.utils import *
 
