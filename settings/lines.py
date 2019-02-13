@@ -5,7 +5,6 @@ After each line with a placeholder there's a comment with its 'future' content.
 """
 from settings.constants import GITHUB_LINK, INV_LINK
 
-# noinspection SpellCheckingInspection
 text_lines = {
     ##############  IMPORTANT  ###############
     # Hierarchy: Cog (Class) -> Method -> Line
