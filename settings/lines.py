@@ -98,7 +98,7 @@ text_lines = {
         'cant_do_in_pm': 'I can\'t perform this command in DMs',
         'none': 'None',
         'unknown_error': 'An unknown error has happened, pls report this line to the bot devs. arigato'
-                         '\n\n**Copy paste this**\n`{}`'  # Error line
+                         '\n\n**Copy and paste this**\n`{}`'  # Error line
     },
 
     'logging': {

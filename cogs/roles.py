@@ -76,7 +76,7 @@ class RoleCommands:
                 # Bunch of useless variables, but it's better to use them
                 # than count this stuff on the fly.
                 old_cz = column_end_number + 1
-                column_end_number += len(chunk)
+                column_end_number += len(chunk[1])
                 header = text_lines['roles']['search']['many_users_header'].format(old_cz, column_end_number)
 
                 # Making a list with shorten names if needed
@@ -264,7 +264,7 @@ class RoleCommands:
         return True
 
     # Divides list into N evenly-sized chunks
-    @classmethod
+    @staticmethod
     def __create_chunks(list_to_divide, number_of_chunks):
         return [list(c) for c in more_itertools.divide(number_of_chunks, list_to_divide)]
 
