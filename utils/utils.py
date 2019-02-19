@@ -20,5 +20,9 @@ def get_role(server, role_name):
     return discord.utils.find(lambda m: m.name.lower() == role_name.lower(), server.roles)
 
 
+def get_text_channel(server, channel_name):
+    return discord.utils.find(lambda m: m.name.lower() == channel_name.lower(), server.text_channels)
+
+
 def get_full_name(user):
     return user.name + "#" + user.discriminator

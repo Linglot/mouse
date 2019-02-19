@@ -27,6 +27,7 @@ settings = {
         },
     },
     'voice': {  # Restrictions for changing channel's language
-        'max_length': 20
+        'max_length': 20,
+        'lang_category_id': 11111111 # Id of category with language-related voice channels
     },
 }
