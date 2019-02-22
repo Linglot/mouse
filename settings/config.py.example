@@ -15,7 +15,7 @@ settings = {
     'logging': {  # Settings for logging features
         'file_name': 'discord.log'
     },
-    'roles':{
+    'roles': {
         'search': {  # Restriction for combined search
             'limit': 4,  # The number of maximum combination of roles in 1 query
             'max_length': 20  # If the name longer than this, it gets cut off
@@ -25,6 +25,9 @@ settings = {
             'blacklist': ['here', 'everyone', 'Lounge', 'Lurker', 'Event host', 'Correct me!', 'Warning'],
             'cooldown': 15 * 60  # in seconds. 15 mins
         },
+        'less_than':{
+            'limit': 50
+        }
     },
     'voice': {  # Restrictions for changing channel's language
         'max_length': 20,
