@@ -21,14 +21,18 @@ class InfoCommands:
         text = 0
         vc = 0
 
+        # All the calculations and stuff
         v_owner = get_full_name(server.owner)
         v_roles = text_lines['server_info']['x_roles'].format(len(server.roles))
         v_features = ", ".join(server.features) if len(server.features) > 0 else text_lines['technical']['none']
         v_default_channel = server.system_channel.mention if server.system_channel else text_lines['technical']['none']
         v_created_at = server.created_at.strftime("%H:%M at %d %b %Y")
-        v_members = text_lines['server_info']['members_line'].format(len(server.members), without_roles)
+        v_members_total = len(server.members)
+        v_members = text_lines['server_info']['members_line'].format(v_members_total-without_roles, without_roles)
+        v_emoji_total = len(server.emojis)
         v_emoji = ", ".join([str(emoji) for emoji in server.emojis])
 
+        v_channels_total = len(server.channels)
         for server_channel in server.channels:
             if isinstance(server_channel, TextChannel):
                 text += 1
@@ -59,19 +63,21 @@ class InfoCommands:
         embed.add_field(name=text_lines['server_info']['titles']['default_channel'],
                         value=v_default_channel,
                         inline=True)
-        embed.add_field(name=text_lines['server_info']['titles']['channels'],
+        embed.add_field(name=text_lines['server_info']['titles']['channels'].format(v_channels_total),
                         value=v_channels,
                         inline=True)
         embed.add_field(name=text_lines['server_info']['titles']['created_at'],
                         value=v_created_at,
                         inline=True)
-        embed.add_field(name=text_lines['server_info']['titles']['members'],
+        embed.add_field(name=text_lines['server_info']['titles']['members'].format(v_members_total),
                         value=v_members,
                         inline=True)
 
         # Otherwise it will crash
         if len(v_emoji) <= 1024:
-            embed.add_field(name=text_lines['server_info']['titles']['emojis'], value=v_emoji, inline=False)
+            embed.add_field(name=text_lines['server_info']['titles']['emojis'].format(v_emoji_total),
+                            value=v_emoji,
+                            inline=False)
 
         await ctx.send(embed=embed)
 

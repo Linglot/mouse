@@ -5,7 +5,7 @@ import more_itertools
 from discord.ext import commands
 
 from settings.config import settings
-from settings.constants import MAIN_COLOR
+from settings.constants import MAIN_COLOR, MOD_ROLES
 from settings.lines import text_lines
 from utils.utils import *
 
@@ -66,7 +66,7 @@ class RoleCommands:
             # if there's more than 30 users, we don't need to display the others
             # Also this is NOT(!) a changeable option due to discord limits
             if number_of_results > 30:
-                found_users = [user for i, user in enumerate(found_users) if i < 10 * 3]
+                found_users = [user for i, user in enumerate(found_users) if i < 30]
                 excluded = number_of_results - 30
                 embed.set_footer(text=text_lines['roles']['search']['and_more'].format(excluded))
 
@@ -140,7 +140,7 @@ class RoleCommands:
         await ctx.send(embed=embed)
 
     # Command for pinging roles
-    # Syntax is: ;ping
+    # Syntax is: ;ping native russian, learning english
     @commands.command(aliases=["mention"])
     @commands.has_any_role(*settings['roles']['ping']['allowed'])
     @commands.cooldown(rate=1, per=settings['roles']['ping']['cooldown'], type=commands.BucketType.user)
@@ -188,62 +188,61 @@ class RoleCommands:
     async def top10(self, ctx):
         server = ctx.message.guild
 
-        role_dict = {}
-        for role in server.roles:
-            role_dict[role.name] = len(role.members)
+        roles = {role.name: len(role.members) for role in server.roles}
 
-        # Larger ones first
-        roles_sorted = sorted(role_dict.items(), reverse=True, key=operator.itemgetter(1))
-
-        native = {}
-        fluent = {}
-        learning = {}
-
-        for key, value in roles_sorted:
-            role_name = key.split()
-            if role_name[0] == "Native":
-                if len(native) < 10:
-                    native[role_name[1]] = value
-            if role_name[0] == "Fluent":
-                if len(fluent) < 10:
-                    fluent[role_name[1]] = value
-            if role_name[0] == "Learning":
-                if len(learning) < 10:
-                    learning[role_name[1]] = value
-
-            if native == fluent == learning == 10:
-                break
+        native, fluent, learning = self.__make_top10_lines(roles)
 
         embed = discord.Embed(colour=discord.Colour(MAIN_COLOR))
         embed.set_author(name=server.name, icon_url=server.icon_url)
 
-        embed.add_field(name="Natives",
-                        value="\n".join([f"[{v}] {k}" for k, v in native.items()]),
-                        inline=True)
-        embed.add_field(name="Fluent",
-                        value="\n".join([f"[{v}] {k}" for k, v in fluent.items()]),
-                        inline=True)
-        embed.add_field(name="Learning",
-                        value="\n".join([f"[{v}] {k}" for k, v in learning.items()]),
-                        inline=True)
+        embed.add_field(name="Natives", value=native, inline=True)
+        embed.add_field(name="Fluent", value=fluent, inline=True)
+        embed.add_field(name="Learning", value=learning, inline=True)
 
-        embed.set_footer(text="Out of {} roles and {} members".format(len(role_dict), len(server.members)),
+        embed.set_footer(text="Out of {} roles and {} members".format(len(roles), len(server.members)),
                          icon_url=self.bot.user.avatar_url)
 
         await ctx.send(embed=embed)
 
-    # # Searches for roles with less than X members
-    # # Syntax: ;lessthan 10
-    # TODO
-    # @commands.command(aliases=["lessthan", "less"], pass_context=True)
-    # @commands.has_any_role(*MOD_ROLES)
-    # async def less_than(self, ctx, *args):
-    #     server = ctx.message.server
-    #     channel = ctx.message.channel
-    #     x = int("".join(args))
-    #
-    #     await info.less_than(self.bot, server, channel, x)
+    # Searches for roles with less than X members
+    # Syntax: ;lessthan 10
+    @commands.command(aliases=["lessthan", "less"])
+    @commands.has_any_role(*MOD_ROLES)
+    @commands.guild_only()
+    async def less_than(self, ctx, *args):
+        roles = ctx.guild.roles
+        try:
+            x = int("".join(args))
+        except:
+            embed = error_embed(text_lines['roles']['less_than']['not_number'])
+            await ctx.send(embed=embed)
+            return
 
+        # Too biggu nambaru?
+        if x > settings['roles']['less_than']['limit']:
+            embed = error_embed(text_lines['roles']['less_than']['too_big'])
+            await ctx.send(embed=embed)
+            return
+
+        # Too sumarru nambaru?
+        if x <= 0:
+            embed = error_embed(text_lines['roles']['less_than']['too_small'])
+            await ctx.send(embed=embed)
+            return
+
+        output = {role.name: len(role.members) for role in roles if len(role.members) < x}
+        results = sorted(output.items(), reverse=True, key=operator.itemgetter(1))
+        line = ', '.join([f"[{v}] {k}" for k, v in results])
+
+        embed = discord.Embed(colour=discord.Colour(MAIN_COLOR),
+                              title=text_lines['roles']['less_than']['title'].format(x),
+                              description=line)
+
+        await ctx.send(embed=embed)
+
+    # Some helpful private functions
+
+    # Basics check for commands if your arguments are roles
     async def __basic_checks(self, ctx, role_list) -> bool:
         # No or too many roles given equals "Bye"
         if len(role_list) < 1 or len(role_list) > settings['roles']['search']['limit']:
@@ -263,12 +262,34 @@ class RoleCommands:
 
         return True
 
+    # Returns 3 strings of roles sorted from most the popular in chunks of 10
+    def __make_top10_lines(self, roles):
+        sorted_roles = sorted(roles.items(), reverse=True, key=operator.itemgetter(1))
+
+        native, fluent, learning = {}, {}, {}
+        for key, value in sorted_roles:
+            role_name = key.split()
+            if role_name[0] == "Native" and len(native) < 10:
+                native[role_name[1]] = value
+            if role_name[0] == "Fluent" and len(fluent) < 10:
+                fluent[role_name[1]] = value
+            if role_name[0] == "Learning" and len(learning) < 10 and role_name[1].lower() != 'other':
+                learning[role_name[1]] = value
+
+            if native == fluent == learning == 10:
+                break
+
+        def make_line(role_list) -> str:
+            return '\n'.join([f"[{v}] {k}" for k, v in role_list.items()])
+
+        return make_line(native), make_line(fluent), make_line(learning)
+
+    # Static methods
+
     # Divides list into N evenly-sized chunks
     @staticmethod
     def __create_chunks(list_to_divide, number_of_chunks):
         return [list(c) for c in more_itertools.divide(number_of_chunks, list_to_divide)]
-
-    # Static methods
 
     # Dividing roles to a list, removing unnecessary spaces and making it lowercase
     # "  native english,    fluent english " -> ["native english", "fluent english"]

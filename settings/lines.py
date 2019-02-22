@@ -48,6 +48,12 @@ text_lines = {
             'slow_down_s': 'You can\'t ping again for {} seconds',  # Seconds
             'no_access': 'You don\'t have the permissions to this command'
         },
+        'less_than': {
+            'not_number': 'r u dumb? gimme an integer',
+            'too_big': 'u gave m-me such a b-big n-number, s-sempai uwu',
+            'too_small': 'u gave m-me such a small n-number, s-sempai uwu (more than 0 pls)',
+            'title': 'Roles with fewer than {} members'  # Number of members
+        }
     },
 
     'server_info': {
@@ -58,14 +64,14 @@ text_lines = {
             'roles': 'Roles',
             'features': 'Features',
             'default_channel': 'Default channel',
-            'channels': 'Channels',
+            'channels': 'Channels: {}',  # Amount of channels
             'created_at': 'Created at',
-            'members': 'Members',
-            'emojis': 'Emojis'
+            'members': 'Members: {}',  # Amount of members
+            'emojis': 'Emojis: {}'  # Amount of emojis
         },
-        'members_line': '{} Members, {} without any roles',  # In total, Without roles
+        'members_line': '{} tagged, {} normies',  # In total, Without roles
         'x_roles': '{} roles',  # Number of roles
-        'channel_line': '{} Text, {} Voice'  # Text channels, Voice channels
+        'channel_line': '{} text, {} voice'  # Text channels, Voice channels
     },
 
     # Text lines for ;info command

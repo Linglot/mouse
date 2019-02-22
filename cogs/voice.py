@@ -24,7 +24,7 @@ class VoiceCommands:
 
             # Empty? Pass
         if len(lang_name.strip()) == 0:
-            await ctx.send(embed=error_embed(text_lines['voice_channel_language']['lang_if_nothing']))
+            await ctx.send(embed=error_embed(text_lines['voice']['change']['empty']))
             return
 
         # If we get "reset" then we're going to use another function
