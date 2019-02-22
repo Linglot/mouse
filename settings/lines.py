@@ -61,7 +61,7 @@ text_lines = {
             'id': 'Id',
             'owner': 'Owner',
             'region': 'Region',
-            'roles': 'Roles',
+            'roles': 'Roles: {}',  # Amount of roles
             'features': 'Features',
             'default_channel': 'Default channel',
             'channels': 'Channels: {}',  # Amount of channels
@@ -70,7 +70,7 @@ text_lines = {
             'emojis': 'Emojis: {}'  # Amount of emojis
         },
         'members_line': '{} tagged, {} normies',  # In total, Without roles
-        'x_roles': '{} roles',  # Number of roles
+        'roles': '{} language, {} other',  # Amount of language roles, Amount of other roles
         'channel_line': '{} text, {} voice'  # Text channels, Voice channels
     },
 

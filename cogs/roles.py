@@ -5,7 +5,7 @@ import more_itertools
 from discord.ext import commands
 
 from settings.config import settings
-from settings.constants import MAIN_COLOR, MOD_ROLES
+from settings.constants import MAIN_COLOR, ADMIN_ROLES
 from settings.lines import text_lines
 from utils.utils import *
 
@@ -207,7 +207,7 @@ class RoleCommands:
     # Searches for roles with less than X members
     # Syntax: ;lessthan 10
     @commands.command(aliases=["lessthan", "less"])
-    @commands.has_any_role(*MOD_ROLES)
+    @commands.has_any_role(*ADMIN_ROLES)
     @commands.guild_only()
     async def less_than(self, ctx, *args):
         roles = ctx.guild.roles
