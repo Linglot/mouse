@@ -20,9 +20,7 @@ class Events:
         if joined_to is not None:
 
             # Language related VCs
-            if joined_to.category.id == settings['voice']['lang_category_id'] and not is_mod(
-                    member):
-                print(member.name + ' joined')
+            if joined_to.category.id == settings['voice']['lang_category_id'] and not is_mod(member):
                 name = VoiceCommands.get_original_name(joined_to.name)
                 channel = get_text_channel(server, name + '-text')
                 if channel is not None:
@@ -40,9 +38,9 @@ class Events:
                 logger.info(text_lines['logging']['lang_removed'].format(left_from.name))
 
             # Removing access to the channel if it was a language related one
-            if left_from.category.id == settings['voice']['lang_category_id'] and not is_mod(
-                    member) and left_from.id != joined_to.id:
-                print(member.name + ' left')
+            # I think I'll be killed one day because of this if
+            if left_from.category.id == settings['voice']['lang_category_id'] and not is_mod(member) \
+                    and left_from.id != (joined_to.id if joined_to is not None else None):
                 name = VoiceCommands.get_original_name(left_from.name)
                 channel = get_text_channel(server, name + '-text')
                 if channel is not None:
