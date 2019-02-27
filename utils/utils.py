@@ -1,7 +1,5 @@
 import discord
-
-# If we get an array of 2 (or more, somehow) then it's splittable
-from settings.constants import INFO_COLOR, ERROR_COLOR
+from settings.constants import INFO_COLOR, ERROR_COLOR, MOD_ROLES
 
 
 # Just a convenient way to make error boxes
@@ -26,3 +24,7 @@ def get_text_channel(server, channel_name):
 
 def get_full_name(user):
     return user.name + "#" + user.discriminator
+
+
+def is_mod(member):
+    return any([role in MOD_ROLES for role in member.roles])

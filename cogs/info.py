@@ -36,12 +36,12 @@ class InfoCommands:
         v_emoji_total = len(server.emojis)
         v_emoji = "".join([str(emoji) for emoji in server.emojis])
 
-        v_channels_total = len(server.channels)
         for server_channel in server.channels:
             if isinstance(server_channel, TextChannel):
                 text += 1
             elif isinstance(server_channel, VoiceChannel):
                 vc += 1
+        v_channels_total = text + vc
         v_channels = text_lines['server_info']['channel_line'].format(text, vc)
 
         # Creating table
