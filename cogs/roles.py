@@ -5,7 +5,7 @@ import more_itertools
 from discord.ext import commands
 
 from settings.config import settings
-from settings.constants import MAIN_COLOR, ADMIN_ROLES
+from settings.constants import MAIN_COLOR, ADMIN_ROLES, NATIVE_COLOR
 from settings.lines import text_lines
 from utils.utils import *
 
@@ -14,6 +14,61 @@ class RoleCommands:
 
     def __init__(self, bot):
         self.bot = bot
+
+    # Command for role assigning.
+    # It has multiple aliases which are adding either "native", "fluent", or "learning".
+    # ;role alias is a normal one and can be used for any role basically.
+    @commands.command(aliases=['role', 'native', 'fluent', 'learning'])
+    @commands.guild_only()
+    async def role_assign(self, ctx, *args):
+        if ctx.invoked_with == 'native':
+            role_name = 'Native ' + ' '.join(args).title()
+        elif ctx.invoked_with == 'fluent':
+            role_name = 'Fluent ' + ' '.join(args).title()
+        elif ctx.invoked_with == 'learning':
+            role_name = 'Learning ' + ' '.join(args).title()
+        else:
+            role_name = ' '.join(args).title()
+
+        splitted = role_name.split(' ')
+
+        if not await self.__check_if_role_exists(ctx, role_name) and (
+                splitted[0] == 'native' or splitted[0] == 'fluent'):
+            # if we can't find it normal way let's try to look up for low-population roles.
+            if await self.__check_if_role_exists(ctx, splitted[1]):
+                # If found we gotta change our role name
+                role_name = splitted[1]
+            else:
+                return False
+
+        server = ctx.guild
+        role = get_role(server, role_name)
+
+        if not await self.__check_allowability_of_role(ctx, role):
+            return False
+
+        user = ctx.author
+
+        # If a user has this role, we will remove it
+        if role in user.roles:
+            if role.color.value == NATIVE_COLOR and not await self.__will_become_nativeless(ctx):
+                return False
+
+            await user.remove_roles(role, reason='self-removed')
+            title = text_lines['roles']['assign']['removed'].format(role.name)
+
+        # If a user doesn't have = we add
+        else:
+            # If a used doesn't have a native role we tell him to do that
+            if not await self.__has_native_role(ctx):
+                return False
+
+            await user.add_roles(role, reason='self-added')
+            title = text_lines['roles']['assign']['added'].format(role.name)
+
+        embed = discord.Embed(title=title, colour=discord.Colour(MAIN_COLOR))
+
+        await ctx.send(embed=embed)
 
     # Command for searching users who have multiple tags
     # Syntax is: ;who role1[, role2 ...]
@@ -244,21 +299,75 @@ class RoleCommands:
 
     # Basics check for commands if your arguments are roles
     async def __basic_checks(self, ctx, role_list) -> bool:
-        # No or too many roles given equals "Bye"
+        if not self.__check_role_quantity(ctx, role_list) or not self.__check_if_role_exists(ctx, role_list):
+            return False
+
+        return True
+
+    # No or too many roles given equals "Bye"
+    async def __check_role_quantity(self, ctx, role_list) -> bool:
         if len(role_list) < 1 or len(role_list) > settings['roles']['search']['limit']:
             embed = error_embed(text_lines['roles']['search']['limit'].format(
                 str(settings['roles']['search']['limit'])))
             await ctx.send(embed=embed)
             return False
 
-        # Do these roles even exist?
+    # Do these roles even exist?
+    async def __check_if_role_exists(self, ctx, role_list) -> bool:
         server_roles = [role.name.lower() for role in ctx.guild.roles]
+
+        # If we received a string in role_list then we gotta convert it to an array
+        if isinstance(role_list, str):
+            role_list = [role_list]  # (this is the worst code I ever wrote, gimme my java back)
+
         for role in role_list:
-            if role not in server_roles:
+            if role.lower() not in server_roles:
                 # If at least one doesn't = rip
                 embed = error_embed(text_lines['roles']['search']['no_role'].format(role.title()))
                 await ctx.send(embed=embed)
                 return False
+        return True
+
+    # Checks if users can self-assign this role
+    async def __check_allowability_of_role(self, ctx, role) -> bool:
+        if not role.color.value in settings['roles']['assign']['allowed_colors']:
+            embed = error_embed(text_lines['roles']['assign']['not_allowed'].format(role.name.title()))
+            await ctx.send(embed=embed)
+            return False
+
+        return True
+
+    # Returns true if user has AT LEAST ONE native role
+    async def __has_native_role(self, ctx):
+        user_roles = ctx.author.roles
+
+        found = False
+
+        for role in user_roles:
+            if role.color.value == NATIVE_COLOR:
+                found = True
+                break
+
+        if not found:
+            embed = error_embed(text_lines['roles']['assign']['native_first'])
+            await ctx.send(embed=embed)
+            return False
+
+        return found
+
+    # Returns true will have 0 native roles after removing one
+    async def __will_become_nativeless(self, ctx):
+        user_roles = ctx.author.roles
+        amount = 0
+
+        for role in user_roles:
+            if role.color.value == NATIVE_COLOR:
+                amount = amount + 1
+
+        if amount <= 1:
+            embed = error_embed(text_lines['roles']['assign']['cant_remove_native'])
+            await ctx.send(embed=embed)
+            return False
 
         return True
 

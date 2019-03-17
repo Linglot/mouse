@@ -22,7 +22,7 @@ class VoiceCommands:
         else:
             return
 
-            # Empty? Pass
+        # Empty? Pass
         if len(lang_name.strip()) == 0:
             await ctx.send(embed=error_embed(text_lines['voice']['change']['empty']))
             return

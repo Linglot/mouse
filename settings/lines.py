@@ -22,6 +22,17 @@ text_lines = {
     },
 
     'roles': {
+        'assign': {
+            'added': 'The role **{}** has been added',  # Role name
+            'removed': 'The role **{}** has been removed',  # Role name
+            'not_allowed': 'You can\'t self-assign this role',
+            'cant_remove_native': 'Did you add the wrong native tag? Add your actual native language first, then remove the incorrect tag.',
+            'native_first': '''Sorry bro, you have to add your native role before adding others.
+                                If it tells you that there\'s no such role use the `;native other` instead.
+                                
+                                Then, add yourself to the document linked below. If you have difficulty doing this from a mobile device, ask someone to do it for you. 
+                                http://bit.ly/linglot-learning-other'''
+        },
         'search': {
             'limit': 'You have to choose for at least 1 role and a maximum of {}',  # Number of maximum roles
             'no_role': 'There\'s no **{}** role on the server',  # Role name
