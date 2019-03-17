@@ -32,27 +32,25 @@ class RoleCommands:
 
         splitted = role_name.split(' ')
 
-        if not await self.__check_if_role_exists(ctx, role_name) and (
-                splitted[0] == 'native' or splitted[0] == 'fluent'):
-            # if we can't find it normal way let's try to look up for low-population roles.
-            if await self.__check_if_role_exists(ctx, splitted[1]):
-                # If found we gotta change our role name
+        if splitted[0].lower() == 'native' or splitted[0].lower() == 'fluent':
+            if await self.__check_if_roles_exists(ctx, splitted[1], output=False):
                 role_name = splitted[1]
-            else:
-                return False
+
+            if not await self.__check_if_roles_exists(ctx, role_name):
+                return
 
         server = ctx.guild
         role = get_role(server, role_name)
 
         if not await self.__check_allowability_of_role(ctx, role):
-            return False
+            return
 
         user = ctx.author
 
         # If a user has this role, we will remove it
         if role in user.roles:
             if role.color.value == NATIVE_COLOR and not await self.__will_become_nativeless(ctx):
-                return False
+                return
 
             await user.remove_roles(role, reason='self-removed')
             title = text_lines['roles']['assign']['removed'].format(role.name)
@@ -61,7 +59,7 @@ class RoleCommands:
         else:
             # If a used doesn't have a native role we tell him to do that
             if not await self.__has_native_role(ctx):
-                return False
+                return
 
             await user.add_roles(role, reason='self-added')
             title = text_lines['roles']['assign']['added'].format(role.name)
@@ -93,7 +91,7 @@ class RoleCommands:
         number_of_results = len(found_users)
         if number_of_results == 0:
             no_results = discord.Embed(title=text_lines['roles']['search']['no_users_title'],
-                                       description=text_lines['roles']['search']['no_users_title'],
+                                       description=text_lines['roles']['search']['try_again'],
                                        colour=discord.Colour(MAIN_COLOR))
             await ctx.send(embed=no_results)
             return
@@ -299,7 +297,9 @@ class RoleCommands:
 
     # Basics check for commands if your arguments are roles
     async def __basic_checks(self, ctx, role_list) -> bool:
-        if not self.__check_role_quantity(ctx, role_list) or not self.__check_if_role_exists(ctx, role_list):
+
+        if not await self.__check_role_quantity(ctx, role_list) or not await self.__check_if_roles_exists(ctx,
+                                                                                                          role_list):
             return False
 
         return True
@@ -311,9 +311,10 @@ class RoleCommands:
                 str(settings['roles']['search']['limit'])))
             await ctx.send(embed=embed)
             return False
+        return True
 
     # Do these roles even exist?
-    async def __check_if_role_exists(self, ctx, role_list) -> bool:
+    async def __check_if_roles_exists(self, ctx, role_list, output=True) -> bool:
         server_roles = [role.name.lower() for role in ctx.guild.roles]
 
         # If we received a string in role_list then we gotta convert it to an array
@@ -323,8 +324,9 @@ class RoleCommands:
         for role in role_list:
             if role.lower() not in server_roles:
                 # If at least one doesn't = rip
-                embed = error_embed(text_lines['roles']['search']['no_role'].format(role.title()))
-                await ctx.send(embed=embed)
+                if output:
+                    embed = error_embed(text_lines['roles']['search']['no_role'].format(role.title()))
+                    await ctx.send(embed=embed)
                 return False
         return True
 
