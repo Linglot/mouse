@@ -26,16 +26,18 @@ text_lines = {
             'added': 'The role **{}** has been added',  # Role name
             'removed': 'The role **{}** has been removed',  # Role name
             'already_have_title': 'You already have this role',
-            'already_have_msg': '''React with {} to remove it or react with {} if you don\'t want to do that.
-                                    _Ignoring this message is also an option if you don't wanna remove it_'''.format(YES_EMOJI, NO_EMOJI),
+            'already_have_msg':
+                '''React with {} to remove it or react with {} if you don\'t want to do that.
+                _Ignoring this message is also an option if you don't wanna remove it_'''.format(YES_EMOJI, NO_EMOJI),
             'not_allowed': 'You can\'t self-assign this role',
             'cant_remove_native': 'Did you add the wrong native tag? Add your actual native language first, then remove the incorrect tag.',
             'dont_have': 'You have to assign the role before trying to remove it',
-            'native_first': '''Sorry bro, you have to add your native role before adding others.
-                                If it tells you that there\'s no such role use the `;native other` instead.
-                                
-                                Then, add yourself to the document linked below. If you have difficulty doing this from a mobile device, ask someone to do it for you. 
-                                http://bit.ly/linglot-learning-other'''
+            'native_first':
+                '''Sorry bro, you have to add your native role before adding others.
+                If it tells you that there\'s no such role use the `;native other` instead.
+                
+                Then, add yourself to the document linked below. If you have difficulty doing this from a mobile device, ask someone to do it for you. 
+                http://bit.ly/linglot-learning-other'''
         },
         'search': {
             'limit': 'You have to choose for at least 1 role and a maximum of {}',  # Number of maximum roles

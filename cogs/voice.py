@@ -49,8 +49,7 @@ class VoiceCommands:
             await vc.edit(name=text_lines['voice']['format'].format(
                 vc.name, VOICE_CHANNEL_DIVIDER, lang_name))
 
-        info = info_embed(text_lines['voice']['change']['done'].format(lang_name))
-        await ctx.send(embed=info)
+        await send_info_embed(ctx, text_lines['voice']['change']['done'].format(lang_name))
 
     # Command for removing language name from VC's name
     # Syntax: ;resetlang
@@ -62,8 +61,7 @@ class VoiceCommands:
         if await self.__basic_checks(ctx):
             vc = ctx.author.voice.channel
             await self.reset_name(vc)
-            info = info_embed(text_lines['voice']['reset'].format(self.get_original_name(vc.name)))
-            await ctx.send(embed=info)
+            await send_info_embed(ctx, text_lines['voice']['reset'].format(self.get_original_name(vc.name)))
 
     # Basic checks, such as permissions
     async def __basic_checks(self, ctx) -> bool:
