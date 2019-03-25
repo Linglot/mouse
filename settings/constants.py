@@ -17,5 +17,8 @@ LEARNING_COLOR = 0xC54b8C
 YELLOW_ROLE_COLOR = 0xFFC40C
 ORANGE_ROLE_COLOR = 0xFF7518
 
+YES_EMOJI = '✅'
+NO_EMOJI = '❌'
+
 GITHUB_LINK = 'https://github.com/Linglot/mouse'
 INV_LINK = 'https://discord.gg/uFWNUBQ'
