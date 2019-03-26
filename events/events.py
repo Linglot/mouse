@@ -32,24 +32,33 @@ class Events:
             if self.__lang_vc_visible(left_from, joined_to, member):
                 await self.__set_permissions(server, left_from, member, False, reason='Left from VC')
 
+    # Resets VC's name if there's no users left in it.
     async def __reset_name(self, left_from):
         if VoiceCommands.can_edit(left_from) and len(left_from.members) == 0 and VoiceCommands.splittable(
                 left_from.name):
             await VoiceCommands.reset_name(left_from)
             logger.info(text_lines['logging']['lang_removed'].format(left_from.name))
 
+    # Sets read&write permissions for a specified channel with given value. Returns true if succeed
     async def __set_permissions(self, server, channel, member, value, reason=''):
         name = VoiceCommands.get_original_name(channel.name)
         channel = get_text_channel(server, name + '-text')
         if channel is not None:
             await channel.set_permissions(member, reason=reason, read_messages=value, send_messages=value)
-
-    def __lang_vc_hidden(self, joined_to, member) -> bool:
-        if joined_to.category.id == settings['voice']['lang_category_id'] and not is_mod(member):
             return True
 
         return False
 
+    # Returns true if a language-related channel is not visible (aka user joins for the first time)
+    def __lang_vc_hidden(self, joined_to, member) -> bool:
+        if joined_to.category is not None \
+                and joined_to.category.id == settings['voice']['lang_category_id'] \
+                and not is_mod(member):
+            return True
+
+        return False
+
+    # Returns true if a language-related channel is visible (aka the permissions have been given in the past)
     def __lang_vc_visible(self, left_from, joined_to, member) -> bool:
         # I think I'll be killed one day because of this if
         if left_from.category is not None \
@@ -60,6 +69,7 @@ class Events:
 
         return False
 
+    # Basic log event for every command
     @staticmethod
     async def on_command(ctx):
         msg = ctx.message
