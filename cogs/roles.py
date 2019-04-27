@@ -22,6 +22,8 @@ class RoleCommands:
     @commands.command(aliases=['role', 'native', 'fluent', 'learning', 'not'])
     @commands.guild_only()
     async def role_assign(self, ctx, *args):
+
+        # We have to add some strings to make aliases searchable
         if ctx.invoked_with == 'native':
             role_name = 'Native ' + ' '.join(args).title()
         elif ctx.invoked_with == 'fluent':
@@ -31,26 +33,29 @@ class RoleCommands:
         else:
             role_name = ' '.join(args).title()
 
-        splitted = role_name.split(' ')
+        splitted_name = role_name.split(' ')
 
-        if splitted[0].lower() == 'native' or splitted[0].lower() == 'fluent':
-            if await self.__check_if_roles_exists(ctx, splitted[1], output=False):
-                role_name = splitted[1]
+        if splitted_name[0].lower() == 'native' or splitted_name[0].lower() == 'fluent':
+            if await self.is_role_exist(ctx, splitted_name[1]):
+                role_name = splitted_name[1]
 
-        if not await self.__check_if_roles_exists(ctx, role_name):
+        if not await self.is_role_exist(ctx, role_name):
+            await send_error_embed(ctx, (text_lines['roles']['search']['no_role'].format(role_name.title())))
             return
 
         server = ctx.guild
         role = get_role(server, role_name)
 
-        if not await self.__check_allowability_of_role(ctx, role):
+        if not await self.is_role_allowable(role):
+            await send_error_embed(ctx, (text_lines['roles']['assign']['not_allowed'].format(role.name.title())))
             return
 
         user = ctx.author
 
         # If a user has this role, we will remove it
         if role in user.roles:
-            if role.color.value == NATIVE_COLOR and not await self.__will_become_nativeless(ctx):
+            if role.color.value == NATIVE_COLOR and await self.__will_become_nativeless(ctx):
+                await send_error_embed(ctx, (text_lines['roles']['assign']['cant_remove_native']))
                 return
 
             if ctx.invoked_with == 'not':
@@ -73,19 +78,26 @@ class RoleCommands:
 
                 except asyncio.TimeoutError:
                     await msg.clear_reactions()
-                    return
+
                 else:
                     if reaction.emoji == YES_EMOJI:
                         await user.remove_roles(role, reason='self-removed')
+                        embed = discord.Embed(title=text_lines['roles']['assign']['removed'].format(role.name),
+                                              colour=discord.Colour(MAIN_COLOR))
+                        await msg.edit(embed=embed)
 
                     await msg.clear_reactions()
+
+                return
 
             title = text_lines['roles']['assign']['removed'].format(role.name)
 
         # If a user doesn't have = we add
         elif ctx.invoked_with != 'not':
-            # If a used doesn't have a native role we tell him to do that
-            if not await self.__has_native_role(ctx):
+
+            # If a used doesn't have a native role we tell him to do that first
+            if not await self.__has_native_role(ctx) and role.color.value != NATIVE_COLOR:
+                await send_error_embed(ctx, (text_lines['roles']['assign']['native_first']))
                 return
 
             await user.add_roles(role, reason='self-added')
@@ -241,8 +253,7 @@ class RoleCommands:
         for blacklist_item in settings['roles']['ping']['blacklist']:
             item = blacklist_item.lower()
             if item in pinging_roles:
-                embed = error_embed(text_lines['roles']['ping']['cant_ping'].format(blacklist_item))
-                await ctx.send(embed=embed)
+                await send_error_embed(ctx, text_lines['roles']['ping']['cant_ping'].format(blacklist_item))
                 return
 
         # Making some roles pingable and making a ping message
@@ -296,20 +307,17 @@ class RoleCommands:
         try:
             x = int("".join(args))
         except:
-            embed = error_embed(text_lines['roles']['less_than']['not_number'])
-            await ctx.send(embed=embed)
+            await send_error_embed(ctx, (text_lines['roles']['less_than']['not_number']))
             return
 
         # Too biggu nambaru?
         if x > settings['roles']['less_than']['limit']:
-            embed = error_embed(text_lines['roles']['less_than']['too_big'])
-            await ctx.send(embed=embed)
+            await send_error_embed(ctx, (text_lines['roles']['less_than']['too_big']))
             return
 
         # Too sumarru nambaru?
         if x <= 0:
-            embed = error_embed(text_lines['roles']['less_than']['too_small'])
-            await ctx.send(embed=embed)
+            await send_error_embed(ctx, (text_lines['roles']['less_than']['too_small']))
             return
 
         output = {role.name: len(role.members) for role in roles if len(role.members) < x}
@@ -327,8 +335,9 @@ class RoleCommands:
     # Basics check for commands if your arguments are roles
     async def __basic_checks(self, ctx, role_list) -> bool:
 
-        if not await self.__check_role_quantity(ctx, role_list) or not await self.__check_if_roles_exists(ctx,
-                                                                                                          role_list):
+        if not await self.__check_role_quantity(ctx, role_list) or \
+                not await self.is_role_exist(ctx, role_list):
+            # TODO
             return False
 
         return True
@@ -336,14 +345,14 @@ class RoleCommands:
     # No or too many roles given equals "Bye"
     async def __check_role_quantity(self, ctx, role_list) -> bool:
         if len(role_list) < 1 or len(role_list) > settings['roles']['search']['limit']:
-            embed = error_embed(text_lines['roles']['search']['limit'].format(
-                str(settings['roles']['search']['limit'])))
-            await ctx.send(embed=embed)
+            await send_error_embed(ctx, (text_lines['roles']['search']['limit'].format(
+                str(settings['roles']['search']['limit']))))
             return False
+
         return True
 
-    # Do these roles even exist?
-    async def __check_if_roles_exists(self, ctx, role_list, output=True) -> bool:
+    # Do(es) certain role(s) even exist?
+    async def is_role_exist(self, ctx, role_list) -> bool:
         server_roles = [role.name.lower() for role in ctx.guild.roles]
 
         # If we received a string in role_list then we gotta convert it to an array
@@ -352,18 +361,13 @@ class RoleCommands:
 
         for role in role_list:
             if role.lower() not in server_roles:
-                # If at least one doesn't = rip
-                if output:
-                    embed = error_embed(text_lines['roles']['search']['no_role'].format(role.title()))
-                    await ctx.send(embed=embed)
                 return False
+
         return True
 
-    # Checks if users can self-assign this role
-    async def __check_allowability_of_role(self, ctx, role) -> bool:
+    # Returns true if role if self-assignable
+    async def is_role_allowable(self, role) -> bool:
         if not role.color.value in settings['roles']['assign']['allowed_colors']:
-            embed = error_embed(text_lines['roles']['assign']['not_allowed'].format(role.name.title()))
-            await ctx.send(embed=embed)
             return False
 
         return True
@@ -371,7 +375,6 @@ class RoleCommands:
     # Returns true if user has AT LEAST ONE native role
     async def __has_native_role(self, ctx):
         user_roles = ctx.author.roles
-
         found = False
 
         for role in user_roles:
@@ -380,8 +383,6 @@ class RoleCommands:
                 break
 
         if not found:
-            embed = error_embed(text_lines['roles']['assign']['native_first'])
-            await ctx.send(embed=embed)
             return False
 
         return found
@@ -396,11 +397,9 @@ class RoleCommands:
                 amount = amount + 1
 
         if amount <= 1:
-            embed = error_embed(text_lines['roles']['assign']['cant_remove_native'])
-            await ctx.send(embed=embed)
-            return False
+            return True
 
-        return True
+        return False
 
     # Returns 3 strings of roles sorted from most the popular in chunks of 10
     def __make_top10_lines(self, roles):

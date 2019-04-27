@@ -4,12 +4,12 @@ from settings.constants import INFO_COLOR, ERROR_COLOR, MOD_ROLES
 
 
 # Just a convenient way to make error boxes
-def send_error_embed(ctx, message, dm=False):
+async def send_error_embed(ctx, message, dm=False):
     embed = discord.Embed(description=message, colour=discord.Colour(ERROR_COLOR))
     if dm:
-        ctx.author.dm_channel.send(embed=embed)
+        await ctx.author.dm_channel.send(embed=embed)
     else:
-        ctx.send(embed=embed)
+        await ctx.send(embed=embed)
 
 
 # Just a convenient way to make info boxes
