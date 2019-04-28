@@ -13,9 +13,9 @@ async def send_error_embed(ctx, message, dm=False):
 
 
 # Just a convenient way to make info boxes
-def send_info_embed(ctx, message):
+async def send_info_embed(ctx, message):
     embed = discord.Embed(description=message, colour=discord.Colour(INFO_COLOR))
-    ctx.send(embed=embed)
+    await ctx.send(embed=embed)
 
 
 def get_role(server, role_name):

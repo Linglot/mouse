@@ -22,16 +22,16 @@ class RoleCommands:
     @commands.command(aliases=['role', 'native', 'fluent', 'learning', 'not'])
     @commands.guild_only()
     async def role_assign(self, ctx, *args):
+        role_name = ' '.join(args).title()
+        called_with = ctx.invoked_with
+
+        if len(role_name.strip()) <= 0:
+            await send_error_embed(ctx, (text_lines['roles']['assign']['empty']))
+            return
 
         # We have to add some strings to make aliases searchable
-        if ctx.invoked_with == 'native':
-            role_name = 'Native ' + ' '.join(args).title()
-        elif ctx.invoked_with == 'fluent':
-            role_name = 'Fluent ' + ' '.join(args).title()
-        elif ctx.invoked_with == 'learning':
-            role_name = 'Learning ' + ' '.join(args).title()
-        else:
-            role_name = ' '.join(args).title()
+        if called_with == 'native' or called_with == 'fluent' or called_with == 'learning':
+            role_name = called_with.title() + role_name
 
         splitted_name = role_name.split(' ')
 
@@ -46,19 +46,17 @@ class RoleCommands:
         server = ctx.guild
         role = get_role(server, role_name)
 
-        if not await self.is_role_allowable(role):
-            await send_error_embed(ctx, (text_lines['roles']['assign']['not_allowed'].format(role.name.title())))
+        if not await self.is_role_allowable(ctx, role, output=True):
             return
 
         user = ctx.author
 
         # If a user has this role, we will remove it
         if role in user.roles:
-            if role.color.value == NATIVE_COLOR and await self.__will_become_nativeless(ctx):
-                await send_error_embed(ctx, (text_lines['roles']['assign']['cant_remove_native']))
+            if role.color.value == NATIVE_COLOR and await self.will_become_nativeless(ctx, output=True):
                 return
 
-            if ctx.invoked_with == 'not':
+            if called_with == 'not':
                 await user.remove_roles(role, reason='self-removed')
             else:
                 embed = discord.Embed(title=text_lines['roles']['assign']['already_have_title'],
@@ -93,10 +91,10 @@ class RoleCommands:
             title = text_lines['roles']['assign']['removed'].format(role.name)
 
         # If a user doesn't have = we add
-        elif ctx.invoked_with != 'not':
+        elif called_with != 'not':
 
             # If a used doesn't have a native role we tell him to do that first
-            if not await self.__has_native_role(ctx) and role.color.value != NATIVE_COLOR:
+            if not await self.has_native_role(ctx) and role.color.value != NATIVE_COLOR:
                 await send_error_embed(ctx, (text_lines['roles']['assign']['native_first']))
                 return
 
@@ -187,6 +185,7 @@ class RoleCommands:
     @commands.command()
     @commands.guild_only()
     async def count(self, ctx, *args):
+        # TODO fix doesnt work
         searching_roles = self.make_role_list(args)
         if await self.__basic_checks(ctx, searching_roles):
             server = ctx.guild
@@ -335,21 +334,21 @@ class RoleCommands:
     # Basics check for commands if your arguments are roles
     async def __basic_checks(self, ctx, role_list) -> bool:
 
-        if not await self.__check_role_quantity(ctx, role_list) or \
-                not await self.is_role_exist(ctx, role_list):
-            # TODO
+        if not await self.check_search_limit(role_list):
+            await send_error_embed(ctx, (text_lines['roles']['search']['limit'].format(
+                str(settings['roles']['search']['limit']))))
             return False
 
-        return True
-
-    # No or too many roles given equals "Bye"
-    async def __check_role_quantity(self, ctx, role_list) -> bool:
-        if len(role_list) < 1 or len(role_list) > settings['roles']['search']['limit']:
+        if not await self.is_role_exist(ctx, role_list):
             await send_error_embed(ctx, (text_lines['roles']['search']['limit'].format(
                 str(settings['roles']['search']['limit']))))
             return False
 
         return True
+
+    # No or too many roles given equals "Bye"
+    async def check_search_limit(self, role_list) -> bool:
+        return len(role_list) < 1 or len(role_list) > settings['roles']['search']['limit']
 
     # Do(es) certain role(s) even exist?
     async def is_role_exist(self, ctx, role_list) -> bool:
@@ -366,40 +365,34 @@ class RoleCommands:
         return True
 
     # Returns true if role if self-assignable
-    async def is_role_allowable(self, role) -> bool:
+    async def is_role_allowable(self, ctx, role, output=False) -> bool:  # TODO TEST
         if not role.color.value in settings['roles']['assign']['allowed_colors']:
             return False
+
+        if output:
+            await send_error_embed(ctx, (text_lines['roles']['assign']['not_allowed'].format(role.name.title())))
 
         return True
 
     # Returns true if user has AT LEAST ONE native role
-    async def __has_native_role(self, ctx):
-        user_roles = ctx.author.roles
-        found = False
-
-        for role in user_roles:
-            if role.color.value == NATIVE_COLOR:
-                found = True
-                break
-
-        if not found:
+    async def has_native_role(self, ctx, output=False):  # TODO TEST
+        if not any(role.color.value == NATIVE_COLOR for role in ctx.author.roles):
             return False
 
-        return found
+        if output:
+            await send_error_embed(ctx, (text_lines['roles']['assign']['native_first']))
+
+        return True
 
     # Returns true will have 0 native roles after removing one
-    async def __will_become_nativeless(self, ctx):
-        user_roles = ctx.author.roles
-        amount = 0
+    async def will_become_nativeless(self, ctx, output=False):  # TODO TEST
+        if not len([role for role in ctx.author.roles if role.color.value == NATIVE_COLOR]) <= 1:
+            return False
 
-        for role in user_roles:
-            if role.color.value == NATIVE_COLOR:
-                amount = amount + 1
+        if output:
+            await send_error_embed(ctx, (text_lines['roles']['assign']['cant_remove_native']))
 
-        if amount <= 1:
-            return True
-
-        return False
+        return True
 
     # Returns 3 strings of roles sorted from most the popular in chunks of 10
     def __make_top10_lines(self, roles):

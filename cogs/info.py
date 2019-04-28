@@ -89,7 +89,7 @@ class InfoCommands:
     # Simple bot-info command
     # Shows discord invite link, git, and some bot-related info
     # Syntax: ;about
-    @commands.command(name='about', aliases=['info'])
+    @commands.command(name='about', aliases=['botinfo'])
     async def show_about(self, ctx):
         # Creating table
         embed = discord.Embed(colour=discord.Colour(INFO_COLOR),

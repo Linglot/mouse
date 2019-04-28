@@ -1,6 +1,5 @@
 from cogs.voice import VoiceCommands
 from settings.config import settings
-from settings.lines import text_lines
 from utils.logger import logger
 from utils.utils import get_text_channel, is_mod
 
@@ -19,28 +18,23 @@ class Events:
         # Joining events
         if joined_to is not None:
             # Language related VCs
-            if self.__lang_vc_hidden(joined_to, member):
-                await self.__set_permissions(server, joined_to, member, True, reason='Joined to VC')
+            if self.should_show_langvc(joined_to, member):
+                await self.set_permissions_to(server, joined_to, member, True, reason='Joined to VC')
 
         # Leaving events
         if left_from is not None:
 
-            # Rename channel to its original name if everyone has left
-            await self.__reset_name(left_from)
+            # Resets VC's name if there's no users left in it.
+            if VoiceCommands.can_edit(left_from) and len(left_from.members) == 0 and VoiceCommands.splittable(
+                    left_from.name):
+                await VoiceCommands.reset_name(left_from)
 
             # Removing access to the channel if it was a language related one
-            if self.__lang_vc_visible(left_from, joined_to, member):
-                await self.__set_permissions(server, left_from, member, False, reason='Left from VC')
-
-    # Resets VC's name if there's no users left in it.
-    async def __reset_name(self, left_from):
-        if VoiceCommands.can_edit(left_from) and len(left_from.members) == 0 and VoiceCommands.splittable(
-                left_from.name):
-            await VoiceCommands.reset_name(left_from)
-            logger.info(text_lines['logging']['lang_removed'].format(left_from.name))
+            if self.should_hide_langvc(left_from, joined_to, member):
+                await self.set_permissions_to(server, left_from, member, False, reason='Left from VC')
 
     # Sets read&write permissions for a specified channel with given value. Returns true if succeed
-    async def __set_permissions(self, server, channel, member, value, reason=''):
+    async def set_permissions_to(self, server, channel, member, value, reason=''):
         name = VoiceCommands.get_original_name(channel.name)
         channel = get_text_channel(server, name + '-text')
         if channel is not None:
@@ -50,24 +44,18 @@ class Events:
         return False
 
     # Returns true if a language-related channel is not visible (aka user joins for the first time)
-    def __lang_vc_hidden(self, joined_to, member) -> bool:
-        if joined_to.category is not None \
-                and joined_to.category.id == settings['voice']['lang_category_id'] \
-                and not is_mod(member):
-            return True
-
-        return False
+    def should_show_langvc(self, joined_to, member) -> bool:
+        return joined_to.category is not None \
+               and joined_to.category.id == settings['voice']['lang_category_id'] \
+               and not is_mod(member)
 
     # Returns true if a language-related channel is visible (aka the permissions have been given in the past)
-    def __lang_vc_visible(self, left_from, joined_to, member) -> bool:
+    def should_hide_langvc(self, left_from, joined_to, member) -> bool:
         # I think I'll be killed one day because of this if
-        if left_from.category is not None \
-                and left_from.category.id == settings['voice']['lang_category_id'] \
-                and not is_mod(member) \
-                and left_from.id != (joined_to.id if joined_to is not None else None):
-            return True
-
-        return False
+        return left_from.category is not None \
+               and left_from.category.id == settings['voice']['lang_category_id'] \
+               and not is_mod(member) \
+               and left_from.id != (joined_to.id if joined_to is not None else None)
 
     # Basic log event for every command
     @staticmethod

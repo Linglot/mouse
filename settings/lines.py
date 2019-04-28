@@ -30,6 +30,7 @@ text_lines = {
                 '''React with {} to remove it or react with {} if you don\'t want to do that.
                 _Ignoring this message is also an option if you don't wanna remove it_'''.format(YES_EMOJI, NO_EMOJI),
             'not_allowed': 'You can\'t self-assign this role',
+            'empty': 'You forgot to type role name',
             'cant_remove_native': 'Did you add the wrong native tag? Add your actual native language first, then remove the incorrect tag.',
             'dont_have': 'You have to assign the role before trying to remove it',
             'native_first':
