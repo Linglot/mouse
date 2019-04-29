@@ -49,8 +49,6 @@ class VoiceCommands:
         # If the name could be split (or had been changed before, in other words)
         # then we just need to change the last part
         if self.splittable(vc.name):
-            # This is poop code right here
-            # TODO: rewrite, but later
             await vc.edit(name=text_lines['voice']['format'].format(
                 self.get_original_name(vc.name), VOICE_CHANNEL_DIVIDER, lang_name))
         # Otherwise add a suffix

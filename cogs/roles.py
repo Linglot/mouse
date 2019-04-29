@@ -31,7 +31,7 @@ class RoleCommands:
 
         # We have to add some strings to make aliases searchable
         if called_with == 'native' or called_with == 'fluent' or called_with == 'learning':
-            role_name = called_with.title() + role_name
+            role_name = called_with.title() + ' ' + role_name
 
         splitted_name = role_name.split(' ')
 
@@ -46,53 +46,28 @@ class RoleCommands:
         server = ctx.guild
         role = get_role(server, role_name)
 
-        if not await self.is_role_allowable(ctx, role, output=True):
+        if not await self.is_role_assignable(role):
+            await send_error_embed(ctx, (text_lines['roles']['assign']['not_allowed'].format(role.name.title())))
             return
 
         user = ctx.author
 
         # If a user has this role, we will remove it
         if role in user.roles:
-            if role.color.value == NATIVE_COLOR and await self.will_become_nativeless(ctx, output=True):
+            if role.color.value == NATIVE_COLOR and await self.will_become_nativeless(ctx):
+                await send_error_embed(ctx, (text_lines['roles']['assign']['cant_remove_native']))
                 return
 
             if called_with == 'not':
                 await user.remove_roles(role, reason='self-removed')
             else:
-                embed = discord.Embed(title=text_lines['roles']['assign']['already_have_title'],
-                                      description=text_lines['roles']['assign']['already_have_msg'],
-                                      colour=discord.Colour(INFO_COLOR))
-                msg = await ctx.send(embed=embed)
-                await msg.add_reaction(YES_EMOJI)
-                await msg.add_reaction(NO_EMOJI)
-
-                def check(reaction1, user1):
-                    return reaction1.message.id == msg.id and user1 == ctx.author
-
-                try:
-                    reaction, user = await self.bot.wait_for('reaction_add',
-                                                             timeout=settings['roles']['assign']['emoji_cd'],
-                                                             check=check)
-
-                except asyncio.TimeoutError:
-                    await msg.clear_reactions()
-
-                else:
-                    if reaction.emoji == YES_EMOJI:
-                        await user.remove_roles(role, reason='self-removed')
-                        embed = discord.Embed(title=text_lines['roles']['assign']['removed'].format(role.name),
-                                              colour=discord.Colour(MAIN_COLOR))
-                        await msg.edit(embed=embed)
-
-                    await msg.clear_reactions()
-
+                await self.role_yes_no_dialogue(ctx, role)
                 return
 
             title = text_lines['roles']['assign']['removed'].format(role.name)
 
-        # If a user doesn't have = we add
+        # If a user doesn't have this role AND the command wasn't called with ;not alias we add a role
         elif called_with != 'not':
-
             # If a used doesn't have a native role we tell him to do that first
             if not await self.has_native_role(ctx) and role.color.value != NATIVE_COLOR:
                 await send_error_embed(ctx, (text_lines['roles']['assign']['native_first']))
@@ -100,7 +75,9 @@ class RoleCommands:
 
             await user.add_roles(role, reason='self-added')
             title = text_lines['roles']['assign']['added'].format(role.name)
-        else:  # Basically an else for ;not command
+
+        # Basically an else for ;not command
+        else:
             title = text_lines['roles']['assign']['dont_have']
 
         embed = discord.Embed(title=title, colour=discord.Colour(MAIN_COLOR))
@@ -365,34 +342,18 @@ class RoleCommands:
         return True
 
     # Returns true if role if self-assignable
-    async def is_role_allowable(self, ctx, role, output=False) -> bool:  # TODO TEST
-        if not role.color.value in settings['roles']['assign']['allowed_colors']:
-            return False
-
-        if output:
-            await send_error_embed(ctx, (text_lines['roles']['assign']['not_allowed'].format(role.name.title())))
-
-        return True
+    # If output = true it'll also send an error message
+    async def is_role_assignable(self, role) -> bool:
+        return role.color.value in settings['roles']['assign']['allowed_colors']
 
     # Returns true if user has AT LEAST ONE native role
-    async def has_native_role(self, ctx, output=False):  # TODO TEST
-        if not any(role.color.value == NATIVE_COLOR for role in ctx.author.roles):
-            return False
-
-        if output:
-            await send_error_embed(ctx, (text_lines['roles']['assign']['native_first']))
-
-        return True
+    async def has_native_role(self, ctx):
+        return any(role.color.value == NATIVE_COLOR for role in ctx.author.roles)
 
     # Returns true will have 0 native roles after removing one
-    async def will_become_nativeless(self, ctx, output=False):  # TODO TEST
-        if not len([role for role in ctx.author.roles if role.color.value == NATIVE_COLOR]) <= 1:
-            return False
-
-        if output:
-            await send_error_embed(ctx, (text_lines['roles']['assign']['cant_remove_native']))
-
-        return True
+    # If output = true it'll also send an error message
+    async def will_become_nativeless(self, ctx):
+        return len([role for role in ctx.author.roles if role.color.value == NATIVE_COLOR]) <= 1
 
     # Returns 3 strings of roles sorted from most the popular in chunks of 10
     def __make_top10_lines(self, roles):
@@ -415,6 +376,35 @@ class RoleCommands:
             return '\n'.join([f"[{v}] {k}" for k, v in role_list.items()])
 
         return make_line(native), make_line(fluent), make_line(learning)
+
+    async def role_yes_no_dialogue(self, ctx, role):
+        embed = discord.Embed(title=text_lines['roles']['assign']['already_have_title'],
+                              description=text_lines['roles']['assign']['already_have_msg'],
+                              colour=discord.Colour(INFO_COLOR))
+        msg = await ctx.send(embed=embed)
+        await msg.add_reaction(YES_EMOJI)
+        await msg.add_reaction(NO_EMOJI)
+
+        def check(c_reaction, c_user):
+            return c_reaction.message.id == msg.id and c_user == ctx.author
+
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add',
+                                                     timeout=settings['roles']['assign']['emoji_cd'],
+                                                     check=check)
+        except asyncio.TimeoutError:
+            await msg.clear_reactions()
+        else:
+            if reaction.emoji == YES_EMOJI:
+                await user.remove_roles(role, reason='self-removed')
+                embed = discord.Embed(title=text_lines['roles']['assign']['removed'].format(role.name),
+                                      colour=discord.Colour(MAIN_COLOR))
+            else:
+                embed = discord.Embed(title=text_lines['roles']['assign']['keep'].format(role.name),
+                                      colour=discord.Colour(MAIN_COLOR))
+
+            await msg.edit(embed=embed)
+            await msg.clear_reactions()
 
     # Static methods
 

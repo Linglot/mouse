@@ -1,7 +1,7 @@
 from settings.constants import MOD_ROLES, NATIVE_COLOR, FLUENT_COLOR, LEARNING_COLOR, YELLOW_ROLE_COLOR, \
     ORANGE_ROLE_COLOR
 
-# You know what it is
+# You know what this is
 TOKEN = "........"
 
 # Commands prefix

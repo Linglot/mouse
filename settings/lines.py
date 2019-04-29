@@ -25,14 +25,16 @@ text_lines = {
         'assign': {
             'added': 'The role **{}** has been added',  # Role name
             'removed': 'The role **{}** has been removed',  # Role name
+            'keep': 'You already had **{}** and opted to keep it.',  # Role name
             'already_have_title': 'You already have this role',
             'already_have_msg':
                 '''React with {} to remove it or react with {} if you don\'t want to do that.
                 _Ignoring this message is also an option if you don't wanna remove it_'''.format(YES_EMOJI, NO_EMOJI),
             'not_allowed': 'You can\'t self-assign this role',
-            'empty': 'You forgot to type role name',
+            'empty': '''Give me the role name
+                        `;role native english` for example''',
             'cant_remove_native': 'Did you add the wrong native tag? Add your actual native language first, then remove the incorrect tag.',
-            'dont_have': 'You have to assign the role before trying to remove it',
+            'dont_have': 'You have to assign the role before removing it',
             'native_first':
                 '''**Sorry bro, you need to tag your native language first.**
                 Once you have a native role, you can add learning and other roles. I'm here to help if you get stuck.'''
