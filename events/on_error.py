@@ -1,13 +1,13 @@
 from math import ceil
 
 from discord import Forbidden
-from discord.ext.commands import CommandOnCooldown, CheckFailure, NoPrivateMessage, CommandNotFound, Cog
+from discord.ext.commands import CommandOnCooldown, CheckFailure, NoPrivateMessage, CommandNotFound
 
 from settings.lines import text_lines
 from utils.utils import send_error_embed
 
 
-class OnError(Cog):
+class OnError:
     def __init__(self, bot):
         self.bot = bot
 

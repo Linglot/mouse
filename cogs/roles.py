@@ -4,7 +4,6 @@ from collections import OrderedDict
 
 import more_itertools
 from discord.ext import commands
-from discord.ext.commands import Cog
 
 from settings.config import settings
 from settings.constants import MAIN_COLOR, ADMIN_ROLES, NATIVE_COLOR, YES_EMOJI, NO_EMOJI
@@ -12,7 +11,7 @@ from settings.lines import text_lines
 from utils.utils import *
 
 
-class RoleCommands(Cog):
+class RoleCommands:
 
     def __init__(self, bot):
         self.bot = bot
