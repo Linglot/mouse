@@ -11,7 +11,7 @@ text_lines = {
     'voice': {
         'change': {
             'must_be_in_vc': 'You must be in a voice channel',
-            'cant_edit': 'Can\'t edit your channel\'s name. ',
+            'cant_edit': 'Can\'t edit this channel\'s name. ',
             'empty': 'Please enter a language',
             'shorter': 'You could use name up to 20 symbols only',
             'done': 'Language set to {}',  # Language name
@@ -63,7 +63,7 @@ text_lines = {
             # Errors
             'slow_down_m': 'You can\'t ping again for {} minutes',  # Minutes
             'slow_down_s': 'You can\'t ping again for {} seconds',  # Seconds
-            'no_access': 'You don\'t have the permissions to this command'
+            'no_access': 'You don\'t have the permissions to perform this command'
         },
         'less_than': {
             'not_number': 'r u dumb? gimme an integer',

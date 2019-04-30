@@ -91,7 +91,7 @@ class RoleCommands:
     async def search(self, ctx, *args):
         searching_roles = self.make_role_list(args)
 
-        if await self.__basic_checks(ctx, searching_roles):
+        if await self.multirole_checks(ctx, searching_roles):
             server = ctx.guild
             found_users = []
         else:
@@ -129,7 +129,8 @@ class RoleCommands:
             else:
                 header = text_lines['roles']['search']['many_users_header'].format(1, number_of_results)
 
-            embed.add_field(name=header, value='\n'.join([member.display_name for member in found_users]), inline=True)
+            member_list = '\n'.join([member.display_name for member in found_users])
+            embed.add_field(name=header, value=member_list, inline=True)
         # 3 columns output
         else:
             # if there's more than 30 users, we don't need to display the others
@@ -149,11 +150,11 @@ class RoleCommands:
                 header = text_lines['roles']['search']['many_users_header'].format(old_cz, column_end_number)
 
                 # Making a list with shorten names if needed
-                row_users_list = [
+                member_list = '\n'.join([
                     self.shorten(member.display_name, settings['roles']['search']['max_length'])
                     for member in chunk[1]  # 1 cuz 0 is index
-                ]
-                embed.add_field(name=header, value='\n'.join(row_users_list), inline=True)
+                ])
+                embed.add_field(name=header, value=member_list, inline=True)
 
         await ctx.send(embed=embed)
 
@@ -162,9 +163,8 @@ class RoleCommands:
     @commands.command()
     @commands.guild_only()
     async def count(self, ctx, *args):
-        # TODO fix doesnt work
         searching_roles = self.make_role_list(args)
-        if await self.__basic_checks(ctx, searching_roles):
+        if await self.multirole_checks(ctx, searching_roles):
             server = ctx.guild
         else:
             return
@@ -217,7 +217,7 @@ class RoleCommands:
     @commands.guild_only()
     async def ping(self, ctx, *args):
         pinging_roles = self.make_role_list(args)
-        if await self.__basic_checks(ctx, pinging_roles):
+        if await self.multirole_checks(ctx, pinging_roles):
             server = ctx.guild
         else:
             return
@@ -308,27 +308,24 @@ class RoleCommands:
 
     # Some helpful private functions
 
-    # Basics check for commands if your arguments are roles
-    async def __basic_checks(self, ctx, role_list) -> bool:
-
+    # Basics check for commands if your want to check multiple roles
+    async def multirole_checks(self, ctx, role_list) -> bool:
         if not await self.check_search_limit(role_list):
             await send_error_embed(ctx, (text_lines['roles']['search']['limit'].format(
                 str(settings['roles']['search']['limit']))))
             return False
 
-        if not await self.is_role_exist(ctx, role_list):
-            await send_error_embed(ctx, (text_lines['roles']['search']['limit'].format(
-                str(settings['roles']['search']['limit']))))
+        if not await self.is_role_exist(ctx, role_list, output=True):
             return False
 
         return True
 
     # No or too many roles given equals "Bye"
     async def check_search_limit(self, role_list) -> bool:
-        return len(role_list) < 1 or len(role_list) > settings['roles']['search']['limit']
+        return 1 <= len(role_list) <= settings['roles']['search']['limit']
 
     # Do(es) certain role(s) even exist?
-    async def is_role_exist(self, ctx, role_list) -> bool:
+    async def is_role_exist(self, ctx, role_list, output=False) -> bool:
         server_roles = [role.name.lower() for role in ctx.guild.roles]
 
         # If we received a string in role_list then we gotta convert it to an array
@@ -337,6 +334,8 @@ class RoleCommands:
 
         for role in role_list:
             if role.lower() not in server_roles:
+                if output:
+                    await send_error_embed(ctx, (text_lines['roles']['search']['no_role'].format(role)))
                 return False
 
         return True
