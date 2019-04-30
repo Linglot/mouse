@@ -1,11 +1,12 @@
 from discord.ext import commands
+from discord.ext.commands import Cog
 
 from settings.config import settings, VOICE_CHANNEL_DIVIDER
 from settings.lines import text_lines
 from utils.utils import *
 
 
-class VoiceCommands:
+class VoiceCommands(Cog):
     reset_lang_aliases = ['resetlang', 'rl', 'reset']
 
     def __init__(self, bot):

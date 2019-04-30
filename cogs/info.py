@@ -1,12 +1,13 @@
 from discord import TextChannel, VoiceChannel
 from discord.ext import commands
+from discord.ext.commands import Cog
 
 from settings.constants import CURRENT_VERSION, GITHUB_LINK, NATIVE_COLOR, FLUENT_COLOR, LEARNING_COLOR
 from settings.lines import text_lines
 from utils.utils import *
 
 
-class InfoCommands:
+class InfoCommands(Cog):
 
     def __init__(self, bot):
         self.bot = bot
