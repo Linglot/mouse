@@ -1,5 +1,5 @@
 # Technically does nothing
-CURRENT_VERSION = '1.1.1'
+CURRENT_VERSION = '1.1.2'
 
 ADMIN_ROLES = ['Admin']
 MOD_ROLES = [*ADMIN_ROLES, 'Moderator']
