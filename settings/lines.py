@@ -3,7 +3,7 @@
 I.e. in 'My name is {}' it gets changed automatically to user's name.
 After each line with a placeholder there's a comment with its 'future' content.
 """
-from settings.constants import GITHUB_LINK, INV_LINK
+from settings.constants import GITHUB_LINK, INV_LINK, NO_EMOJI, YES_EMOJI
 
 text_lines = {
     ##############  IMPORTANT  ###############
@@ -11,7 +11,7 @@ text_lines = {
     'voice': {
         'change': {
             'must_be_in_vc': 'You must be in a voice channel',
-            'cant_edit': 'Can\'t edit your channel\'s name. ',
+            'cant_edit': 'Can\'t edit this channel\'s name. ',
             'empty': 'Please enter a language',
             'shorter': 'You could use name up to 20 symbols only',
             'done': 'Language set to {}',  # Language name
@@ -22,6 +22,23 @@ text_lines = {
     },
 
     'roles': {
+        'assign': {
+            'added': 'The role **{}** has been added',  # Role name
+            'removed': 'The role **{}** has been removed',  # Role name
+            'keep': 'You already had **{}** and opted to keep it.',  # Role name
+            'already_have_title': 'You already have this role',
+            'already_have_msg':
+                '''React with {} to remove it or react with {} if you don\'t want to do that.
+                _Ignoring this message is also an option if you don't wanna remove it_'''.format(YES_EMOJI, NO_EMOJI),
+            'not_allowed': 'You can\'t self-assign this role',
+            'empty': '''Give me the role name
+                        `;role native english` for example''',
+            'cant_remove_native': 'Did you add the wrong native tag? Add your actual native language first, then remove the incorrect tag.',
+            'dont_have': 'You have to assign the role before removing it',
+            'native_first':
+                '''**Sorry bro, you need to tag your native language first.**
+                Once you have a native role, you can add learning and other roles. I'm here to help if you get stuck.'''
+        },
         'search': {
             'limit': 'You have to choose for at least 1 role and a maximum of {}',  # Number of maximum roles
             'no_role': 'There\'s no **{}** role on the server',  # Role name
@@ -46,7 +63,7 @@ text_lines = {
             # Errors
             'slow_down_m': 'You can\'t ping again for {} minutes',  # Minutes
             'slow_down_s': 'You can\'t ping again for {} seconds',  # Seconds
-            'no_access': 'You don\'t have the permissions to this command'
+            'no_access': 'You don\'t have the permissions to perform this command'
         },
         'less_than': {
             'not_number': 'r u dumb? gimme an integer',

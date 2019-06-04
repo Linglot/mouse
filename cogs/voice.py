@@ -6,42 +6,49 @@ from utils.utils import *
 
 
 class VoiceCommands:
+    reset_lang_aliases = ['resetlang', 'rl', 'reset']
 
     def __init__(self, bot):
         self.bot = bot
 
     # Command for changing VC's language in title
     # Syntax: ;lang Language Name
-    @commands.command(name='language', aliases=["lang", "l"])
+    @commands.command(name='language', aliases=['lang', 'l', *reset_lang_aliases])
     @commands.guild_only()
     async def change_vc_name(self, ctx, *args):
         lang_name = " ".join(args).title()
 
-        if await self.__basic_checks(ctx):
-            vc = ctx.author.voice.channel
-        else:
-            return
+        # If user isn't even in VC we tell they that they should be in one.
+        if not self.user_in_vc(ctx.author):
+            await send_error_embed(ctx, text_lines['voice']['change']['must_be_in_vc'])
+            return False
 
-            # Empty? Pass
-        if len(lang_name.strip()) == 0:
-            await ctx.send(embed=error_embed(text_lines['voice']['change']['empty']))
-            return
+        # Permissions check
+        if not self.can_edit(ctx.author.voice.channel):
+            await send_error_embed(ctx, text_lines['voice']['change']['cant_edit'])
+            return False
+
+        vc = ctx.author.voice.channel
 
         # If we get "reset" then we're going to use another function
-        if lang_name.strip() == "reset":
+        if lang_name.strip() == "reset" or ctx.invoked_with in self.reset_lang_aliases:
             await self.reset_name(vc)
+            await send_info_embed(ctx, text_lines['voice']['reset'].format(self.get_original_name(vc.name)))
+            return
+
+        # Empty? Pass
+        if len(lang_name.strip()) == 0:
+            await send_error_embed(ctx, text_lines['voice']['change']['empty'])
             return
 
         # I wish my iq were that big (20 chars max length)
         if len(lang_name) > settings['voice']['max_length']:
-            await ctx.send(embed=error_embed(text_lines['voice']['change']['shorter']))
+            await send_error_embed(ctx, text_lines['voice']['change']['shorter'])
             return
 
         # If the name could be split (or had been changed before, in other words)
         # then we just need to change the last part
         if self.splittable(vc.name):
-            # This is poop code right here
-            # TODO: rewrite, but later
             await vc.edit(name=text_lines['voice']['format'].format(
                 self.get_original_name(vc.name), VOICE_CHANNEL_DIVIDER, lang_name))
         # Otherwise add a suffix
@@ -49,35 +56,7 @@ class VoiceCommands:
             await vc.edit(name=text_lines['voice']['format'].format(
                 vc.name, VOICE_CHANNEL_DIVIDER, lang_name))
 
-        info = info_embed(text_lines['voice']['change']['done'].format(lang_name))
-        await ctx.send(embed=info)
-
-    # Command for removing language name from VC's name
-    # Syntax: ;resetlang
-    @commands.command(name='resetlang', aliases=["rl"])
-    @commands.guild_only()
-    async def reset_name_command(self, ctx):
-        # If user isn't even in VC we tell they that they should be in one.
-
-        if await self.__basic_checks(ctx):
-            vc = ctx.author.voice.channel
-            await self.reset_name(vc)
-            info = info_embed(text_lines['voice']['reset'].format(self.get_original_name(vc.name)))
-            await ctx.send(embed=info)
-
-    # Basic checks, such as permissions
-    async def __basic_checks(self, ctx) -> bool:
-        # If user isn't even in VC we tell they that they should be in one.
-        if not self.user_in_vc(ctx.author):
-            await ctx.send(embed=error_embed(text_lines['voice']['change']['must_be_in_vc']))
-            return False
-
-        # Permissions check
-        if not self.can_edit(ctx.author.voice.channel):
-            await ctx.send(embed=error_embed(text_lines['voice']['change']['cant_edit']))
-            return False
-
-        return True
+        await send_info_embed(ctx, text_lines['voice']['change']['done'].format(lang_name))
 
     # Static helpful methods after
 

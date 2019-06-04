@@ -1,6 +1,7 @@
-from settings.constants import MOD_ROLES
+from settings.constants import MOD_ROLES, NATIVE_COLOR, FLUENT_COLOR, LEARNING_COLOR, YELLOW_ROLE_COLOR, \
+    ORANGE_ROLE_COLOR
 
-# You know what it is
+# You know what this is
 TOKEN = "........"
 
 # Commands prefix
@@ -16,6 +17,10 @@ settings = {
         'file_name': 'discord.log'
     },
     'roles': {
+        'assign': {
+            'allowed_colors': [NATIVE_COLOR, FLUENT_COLOR, LEARNING_COLOR, YELLOW_ROLE_COLOR, ORANGE_ROLE_COLOR],
+            'emoji_cd': 30.0
+        },
         'search': {  # Restriction for combined search
             'limit': 4,  # The number of maximum combination of roles in 1 query
             'max_length': 20  # If the name longer than this, it gets cut off
@@ -25,12 +30,12 @@ settings = {
             'blacklist': ['here', 'everyone', 'Lounge', 'Lurker', 'Event host', 'Correct me!', 'Warning'],
             'cooldown': 15 * 60  # in seconds. 15 mins
         },
-        'less_than':{
+        'less_than': {
             'limit': 50
         }
     },
     'voice': {  # Restrictions for changing channel's language
         'max_length': 20,
-        'lang_category_id': 11111111 # Id of category with language-related voice channels
+        'lang_category_id': 11111111  # Id of category with language-related voice channels
     },
 }

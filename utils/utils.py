@@ -1,17 +1,21 @@
 import discord
+
 from settings.constants import INFO_COLOR, ERROR_COLOR, MOD_ROLES
 
 
 # Just a convenient way to make error boxes
-def error_embed(message):
+async def send_error_embed(ctx, message, dm=False):
     embed = discord.Embed(description=message, colour=discord.Colour(ERROR_COLOR))
-    return embed
+    if dm:
+        await ctx.author.dm_channel.send(embed=embed)
+    else:
+        await ctx.send(embed=embed)
 
 
 # Just a convenient way to make info boxes
-def info_embed(message):
+async def send_info_embed(ctx, message):
     embed = discord.Embed(description=message, colour=discord.Colour(INFO_COLOR))
-    return embed
+    await ctx.send(embed=embed)
 
 
 def get_role(server, role_name):
@@ -27,4 +31,5 @@ def get_full_name(user):
 
 
 def is_mod(member):
-    return any([role in MOD_ROLES for role in member.roles])
+    return True
+    #return any([role in MOD_ROLES for role in member.roles])

@@ -4,7 +4,7 @@ from discord import Forbidden
 from discord.ext.commands import CommandOnCooldown, CheckFailure, NoPrivateMessage, CommandNotFound
 
 from settings.lines import text_lines
-from utils.utils import error_embed
+from utils.utils import send_error_embed
 
 
 class OnError:
@@ -17,24 +17,20 @@ class OnError:
         if isinstance(exception, CommandOnCooldown):
             seconds = exception.retry_after
             if seconds > 60:
-                embed = error_embed(text_lines['roles']['ping']['slow_down_m'].format(ceil(seconds / 60)))
+                await send_error_embed(ctx, text_lines['roles']['ping']['slow_down_m'].format(ceil(seconds / 60)))
             else:
-                embed = error_embed(text_lines['roles']['ping']['slow_down_s'].format(seconds))
-            await ctx.send(embed=embed)
+                await send_error_embed(ctx, text_lines['roles']['ping']['slow_down_s'].format(seconds))
         elif isinstance(exception, NoPrivateMessage):
-            embed = error_embed(text_lines['technical']['cant_do_in_pm'])
-            await ctx.send(embed=embed)
+            await send_error_embed(ctx, text_lines['technical']['cant_do_in_pm'])
         elif isinstance(exception, CheckFailure):
-            embed = error_embed(text_lines['roles']['ping']['no_access'])
-            await ctx.send(embed=embed)
+            await send_error_embed(ctx, text_lines['roles']['ping']['no_access'])
         elif isinstance(exception, CommandNotFound):
             return
         elif isinstance(exception, Forbidden):
-            embed = error_embed(text_lines['technical']['forbidden'].format(channel.name, ctx.guild))
-            await ctx.author.dm_channel.send(embed=embed)
+            await send_error_embed(ctx, text_lines['technical']['forbidden'].format(channel.name, ctx.guild), dm=True)
         else:
-            embed = error_embed(text_lines['technical']['unknown_error'].format(exception))
-            await ctx.send(embed=embed)
+            await send_error_embed(ctx, text_lines['technical']['unknown_error'].format(exception))
+
 
 def setup(bot):
     bot.add_cog(OnError(bot))
