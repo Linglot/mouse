@@ -4,7 +4,7 @@ from settings.config import settings, VOICE_CHANNEL_DIVIDER
 from settings.lines import text_lines
 from utils.utils import *
 
-
+# This class is designed to do all the word with voice channels and so.
 class VoiceCommands:
     reset_lang_aliases = ['resetlang', 'rl', 'reset']
 
@@ -13,6 +13,7 @@ class VoiceCommands:
 
     # Command for changing VC's language in title
     # Syntax: ;lang Language Name
+    # It also could be called with reset_lang_aliases, but it would only remove the current channel's name
     @commands.command(name='language', aliases=['lang', 'l', *reset_lang_aliases])
     @commands.guild_only()
     async def change_vc_name(self, ctx, *args):
@@ -41,7 +42,8 @@ class VoiceCommands:
             await send_error_embed(ctx, text_lines['voice']['change']['empty'])
             return
 
-        # I wish my iq were that big (20 chars max length)
+        # I wish my iq were that big (20 chars max length) (Discord simple can't show more)
+        # Probably the algorithm should be taking original VC name into calculations too, not just the added suffix
         if len(lang_name) > settings['voice']['max_length']:
             await send_error_embed(ctx, text_lines['voice']['change']['shorter'])
             return
@@ -80,7 +82,7 @@ class VoiceCommands:
     def can_edit(channel):
         return channel.permissions_for(channel.guild.me).manage_channels
 
-    # Returns true if VC's name was changed
+    # Returns true if VC's name was changed before
     @staticmethod
     def splittable(vc_name):
         return len(vc_name.split(" {} ".format(VOICE_CHANNEL_DIVIDER))) >= 2

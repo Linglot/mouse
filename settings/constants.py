@@ -1,6 +1,7 @@
 # Technically does nothing
 CURRENT_VERSION = '1.1.2'
 
+# Made it like this in case the amount of it will be increased
 ADMIN_ROLES = ['Admin']
 MOD_ROLES = [*ADMIN_ROLES, 'Moderator']
 
@@ -17,6 +18,7 @@ LEARNING_COLOR = 0xC54b8C
 YELLOW_ROLE_COLOR = 0xFFC40C
 ORANGE_ROLE_COLOR = 0xFF7518
 
+# (didn't know it works like that tho lol)
 YES_EMOJI = '✅'
 NO_EMOJI = '❌'
 

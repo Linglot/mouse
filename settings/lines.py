@@ -1,13 +1,15 @@
 """
 {} is a placeholder, be careful with it.
 I.e. in 'My name is {}' it gets changed automatically to user's name.
-After each line with a placeholder there's a comment with its 'future' content.
+After each line with a placeholder there's a comment for what is that placeholder for
+Of there are multiple placeholders in one line, They're divided by the comma in its natural sequence
 """
 from settings.constants import GITHUB_LINK, INV_LINK, NO_EMOJI, YES_EMOJI
 
 text_lines = {
     ##############  IMPORTANT  ###############
     # Hierarchy: Cog (Class) -> Method -> Line
+    # (late me) got broken when became big, too late to change at this point, only the refactoring will help
     'voice': {
         'change': {
             'must_be_in_vc': 'You must be in a voice channel',
@@ -56,7 +58,6 @@ text_lines = {
             'no_users': 'No users match the combination: {}',  # Role list
             'total': 'Total in {}: **{}**\n'  # Role name, Number of users
         },
-
         'ping': {
             'cant_ping': 'You can\'t ping `{}`',  # Role name
 
@@ -70,6 +71,9 @@ text_lines = {
             'too_big': 'u gave m-me such a b-big n-number, s-sempai uwu',
             'too_small': 'u gave m-me such a small n-number, s-sempai uwu (more than 0 pls)',
             'title': 'Roles with fewer than {} members'  # Number of members
+        },
+        'top10': {
+            'bottom_line': 'Out of {} roles and {} members'  # Total amount of roles, Total amount of members
         }
     },
 

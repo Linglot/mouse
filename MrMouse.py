@@ -6,8 +6,10 @@ bot = Bot(command_prefix=PREFIX)
 
 extensions = [
     # Commands
+    'cogs.admin',
     'cogs.info',
     'cogs.roles',
+    # 'cogs.tech', Has nothing anyways
     'cogs.voice',
 
     # Events
@@ -33,4 +35,6 @@ if __name__ == "__main__":
         bot.load_extension(extension)
         print("Extensions: {} module was loaded.".format(extension))
 
+# Do not remove any of these, otherwise some commands would have wrong numbers or the bot could stop working
+# without being "resurrected" by itself
 bot.run(TOKEN, bot=True, reconnect=True, fetch_offline_members=True)

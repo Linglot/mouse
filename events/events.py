@@ -4,16 +4,25 @@ from utils.logger import logger
 from utils.utils import get_text_channel, is_mod
 
 
+# This class designed to control all the possible events
 class Events:
     def __init__(self, bot):
         self.bot = bot
 
+    # This is called every time a used joins or left any VC
     async def on_voice_state_update(self, member, before, after):
         # VC user was before changing his state
         # None if he wasn't in VC before
         server = member.guild
         left_from = before.channel if before.channel is not None else None
         joined_to = after.channel if after.channel is not None else None
+
+        #
+        #
+        # There's some code related to language voice channels feature, but Yata said it's not needed anymore
+        # but I didn't have time to get rid of it. It wont work anyways, cuz it check the ID every time (which is in setting)
+        #
+        #
 
         # Joining events
         if joined_to is not None:
