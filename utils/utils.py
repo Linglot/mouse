@@ -31,5 +31,4 @@ def get_full_name(user):
 
 
 def is_mod(member):
-    return True
-    #return any([role in MOD_ROLES for role in member.roles])
+    return any([role in MOD_ROLES for role in member.roles])
