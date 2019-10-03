@@ -6,7 +6,7 @@ from settings.lines import text_lines
 from utils.utils import *
 
 
-class InfoCommands:
+class InfoCommands(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot

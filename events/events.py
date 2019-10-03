@@ -2,9 +2,9 @@ from cogs.voice import VoiceCommands
 from settings.config import settings
 from utils.logger import logger
 from utils.utils import get_text_channel, is_mod
+from discord.ext.commands import Cog
 
-
-class Events:
+class Events(Cog):
     def __init__(self, bot):
         self.bot = bot
 

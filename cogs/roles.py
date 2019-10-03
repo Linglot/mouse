@@ -11,7 +11,7 @@ from settings.lines import text_lines
 from utils.utils import *
 
 
-class RoleCommands:
+class RoleCommands(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot

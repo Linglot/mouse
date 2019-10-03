@@ -5,7 +5,7 @@ from settings.lines import text_lines
 from utils.utils import *
 
 
-class VoiceCommands:
+class VoiceCommands(commands.Cog):
     reset_lang_aliases = ['resetlang', 'rl', 'reset']
 
     def __init__(self, bot):
