@@ -1,7 +1,9 @@
+from functools import reduce
+
 from discord import TextChannel, VoiceChannel
 from discord.ext import commands
 
-from settings.constants import CURRENT_VERSION, GITHUB_LINK, NATIVE_COLOR, FLUENT_COLOR, LEARNING_COLOR
+from settings.constants import CURRENT_VERSION, GITHUB_LINK, LANGUAGE_ROLES
 from settings.lines import text_lines
 from utils.utils import *
 
@@ -17,13 +19,8 @@ class InfoCommands(commands.Cog):
     @commands.guild_only()
     async def server_info(self, ctx):
         server = ctx.message.guild
-        language_roles = len([role for role in server.roles if
-                              role.color.value == NATIVE_COLOR or
-                              role.color.value == FLUENT_COLOR or
-                              role.color.value == LEARNING_COLOR])
+        language_roles = len([role for role in server.roles if role in LANGUAGE_ROLES])
         without_roles = len([member for member in server.members if len(member.roles) == 1])
-        text = 0
-        vc = 0
 
         # All the calculations and stuff
         v_owner = get_full_name(server.owner)
@@ -34,21 +31,18 @@ class InfoCommands(commands.Cog):
         v_members_total = len(server.members)
         v_members = text_lines['server_info']['members_line'].format(v_members_total - without_roles, without_roles)
         v_emoji_total = len(server.emojis)
-        v_emoji = "".join([str(emoji) for emoji in server.emojis])
+        v_emoji = "".join([str(emoji) for emoji in server.emojis])  # This is a string of *all* emojis in the server
 
-        for server_channel in server.channels:
-            if isinstance(server_channel, TextChannel):
-                text += 1
-            elif isinstance(server_channel, VoiceChannel):
-                vc += 1
-        v_channels_total = text + vc
-        v_channels = text_lines['server_info']['channel_line'].format(text, vc)
+        # Counts the number of text and voice channels in the server
+        text_channel_count = len(list(filter(lambda channel: isinstance(channel, TextChannel), server.channels)))
+        voice_channel_count = len(server.channels) - text_channel_count
+
+        v_channels = text_lines['server_info']['channel_line'].format(text_channel_count, voice_channel_count)
 
         # Creating table
         embed = discord.Embed(colour=discord.Colour(INFO_COLOR))
         embed.set_thumbnail(url=server.icon_url)
         embed.set_author(name=server.name, icon_url=server.icon_url)
-
         embed.add_field(name=text_lines['server_info']['titles']['id'],
                         value=server.id,
                         inline=True)
@@ -61,7 +55,7 @@ class InfoCommands(commands.Cog):
         embed.add_field(name=text_lines['server_info']['titles']['region'],
                         value=server.region,
                         inline=True)
-        embed.add_field(name=text_lines['server_info']['titles']['channels'].format(v_channels_total),
+        embed.add_field(name=text_lines['server_info']['titles']['channels'].format(len(server.channels)),
                         value=v_channels,
                         inline=True)
         embed.add_field(name=text_lines['server_info']['titles']['default_channel'],
