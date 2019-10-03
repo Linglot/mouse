@@ -1,5 +1,5 @@
 # Technically does nothing
-CURRENT_VERSION = '1.1.2'
+CURRENT_VERSION = '2.0.0'
 
 ADMIN_ROLES = ['Admin']
 MOD_ROLES = [*ADMIN_ROLES, 'Moderator']
@@ -17,8 +17,10 @@ LEARNING_COLOR = 0xC54b8C
 YELLOW_ROLE_COLOR = 0xFFC40C
 ORANGE_ROLE_COLOR = 0xFF7518
 
+LANGUAGE_ROLES = [NATIVE_COLOR, FLUENT_COLOR, LEARNING_COLOR]
+
 YES_EMOJI = '✅'
 NO_EMOJI = '❌'
 
 GITHUB_LINK = 'https://github.com/Linglot/mouse'
-INV_LINK = 'https://discord.gg/uFWNUBQ'
+INVITE_LINK = 'https://discord.gg/uFWNUBQ'
