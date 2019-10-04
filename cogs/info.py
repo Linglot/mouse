@@ -1,5 +1,3 @@
-from functools import reduce
-
 from discord import TextChannel, VoiceChannel
 from discord.ext import commands
 
