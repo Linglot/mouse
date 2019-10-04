@@ -17,7 +17,7 @@ class VoiceCommands(commands.Cog):
     @commands.command(name='language', aliases=['lang', 'l', *RESET_LANG_ALIASES])
     @commands.guild_only()
     async def change_vc_name(self, ctx, *args):
-        lang_name = " ".join(args).title()
+        lang_name = " ".join(args).title().strip()
 
         # If user isn't even in VC we tell they that they should be in one.
         if not self.user_in_vc(ctx.author):
@@ -32,13 +32,13 @@ class VoiceCommands(commands.Cog):
         vc = ctx.author.voice.channel
 
         # If we get "reset" then we're going to use another function
-        if lang_name.strip() == "reset" or ctx.invoked_with in self.RESET_LANG_ALIASES:
+        if lang_name == "reset" or ctx.invoked_with in self.RESET_LANG_ALIASES:
             await self.reset_name(vc)
             await send_info_embed(ctx, text_lines['voice']['reset'].format(self.get_original_name(vc.name)))
             return
 
         # Empty? Pass
-        if len(lang_name.strip()) == 0:
+        if len(lang_name) == 0:
             await send_error_embed(ctx, text_lines['voice']['change']['empty'])
             return
 
