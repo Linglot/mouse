@@ -1,6 +1,5 @@
 import asyncio
 import operator
-from collections import OrderedDict
 
 import discord
 
@@ -418,8 +417,8 @@ class RoleCommands(commands.Cog):
     # "  native english,    fluent english " -> ["native english", "fluent english"]
     @staticmethod
     def make_role_list(role_string):
-        result = [role.strip().lower() for role in " ".join(role_string).split(",") if role.strip() != ""]
-        return list(OrderedDict.fromkeys(result))
+        # converts to a `set` to ensure no duplicates
+        return set([role.strip().lower() for role in " ".join(role_string).split(",") if role.strip() != ""])
 
     # Add a … symbol if the is longer than "limit"
     @staticmethod
