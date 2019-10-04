@@ -20,7 +20,7 @@ class InfoCommands(commands.Cog):
         server = ctx.message.guild
 
         # Get number of language roles on the server
-        language_role_count = len(list(filter(lambda role: role in LANGUAGE_ROLES, server.roles)))
+        language_role_count = len(list(filter(lambda role: role.color.value in LANGUAGE_ROLES, server.roles)))
 
         # Get number of users without any roles on the server
         # Every user is implicitly in `@everyone`, which is why we check if `len(member.roles) == 1`
@@ -42,7 +42,7 @@ class InfoCommands(commands.Cog):
 
         # Counts the number of text and voice channels in the server
         text_channel_count = len(list(filter(lambda channel: isinstance(channel, TextChannel), server.channels)))
-        voice_channel_count = len(server.channels) - text_channel_count
+        voice_channel_count = len(list(filter(lambda channel: isinstance(channel, VoiceChannel), server.channels)))
         channel_info = text_lines['server_info']['channel_line'].format(text_channel_count, voice_channel_count)
 
         # Create table for server info
@@ -61,7 +61,8 @@ class InfoCommands(commands.Cog):
         embed.add_field(name=text_lines['server_info']['titles']['region'],
                         value=server.region,
                         inline=True)
-        embed.add_field(name=text_lines['server_info']['titles']['channels'].format(len(server.channels)),
+        embed.add_field(name=text_lines['server_info']['titles']['channels'].format(voice_channel_count +
+                                                                                    text_channel_count),
                         value=channel_info,
                         inline=True)
         embed.add_field(name=text_lines['server_info']['titles']['default_channel'],
