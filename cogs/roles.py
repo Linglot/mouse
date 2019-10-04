@@ -138,7 +138,8 @@ class RoleCommands(commands.Cog):
             # if there's more than 30 users, we don't need to display the others
             # Also this is NOT(!) a changeable option due to discord limits
             if number_of_results > 30:
-                found_users = [user for i, user in enumerate(found_users) if i < 30]
+                found_users = found_users[:30]
+
                 excluded = number_of_results - 30
                 embed.set_footer(text=text_lines['roles']['search']['and_more'].format(excluded))
 
@@ -178,7 +179,7 @@ class RoleCommands(commands.Cog):
         # Counting the combination of peeps
         for member in server.members:
             user_roles = [str(role).lower() for role in member.roles]
-            if set(searching_roles).issubset(user_roles):
+            if searching_roles.issubset(user_roles):
                 users_in_combination += 1
 
         # Looking for peeps
@@ -278,7 +279,7 @@ class RoleCommands(commands.Cog):
     # Searches for roles with less than X members
     # Syntax: ;lessthan 10
     @commands.command(aliases=["lessthan", "less"])
-    @commands.has_any_role(*ADMIN_ROLES)
+    # @commands.has_any_role(*ADMIN_ROLES)
     @commands.guild_only()
     async def less_than(self, ctx, *args):
         roles = ctx.guild.roles
