@@ -1,9 +1,10 @@
 from discord import TextChannel, VoiceChannel
 from discord.ext import commands
 
-from settings.constants import CURRENT_VERSION, GITHUB_LINK, LANGUAGE_ROLES
+import discord
+
+from settings.constants import CURRENT_VERSION, GITHUB_LINK, LANGUAGE_ROLES, INFO_COLOR
 from settings.lines import text_lines
-from utils.utils import *
 
 
 class InfoCommands(commands.Cog):

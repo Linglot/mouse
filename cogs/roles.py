@@ -1,13 +1,15 @@
 import asyncio
+import discord
 import operator
 
 from more_itertools import divide
 from discord.ext import commands
 
 from settings.config import settings
-from settings.constants import MAIN_COLOR, ADMIN_ROLES, NATIVE_COLOR, YES_EMOJI, NO_EMOJI
+from settings.constants import MAIN_COLOR, ADMIN_ROLES, NATIVE_COLOR, YES_EMOJI, NO_EMOJI, INFO_COLOR
 from settings.lines import text_lines
-from utils.utils import *
+
+from utils.utils import send_error_embed
 
 
 class RoleCommands(commands.Cog):

@@ -2,7 +2,8 @@ from discord.ext import commands
 
 from settings.config import settings, VOICE_CHANNEL_DIVIDER
 from settings.lines import text_lines
-from utils.utils import *
+
+from utils.utils import send_error_embed, send_info_embed
 
 
 class VoiceCommands(commands.Cog):
