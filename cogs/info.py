@@ -38,7 +38,8 @@ class InfoCommands(commands.Cog):
 
         emoji_count = len(server.emojis)
         # This is a string of *all* custom emojis in the server
-        emoji_preview = "".join([str(emoji) for emoji in server.emojis])
+        # Using map here is slightly faster than a list comprehension, but also looks a lot prettier
+        emoji_preview = "".join(map(str, server.emojis))
 
         # Counts the number of text and voice channels in the server
         text_channel_count = len(list(filter(lambda channel: isinstance(channel, TextChannel), server.channels)))
@@ -80,8 +81,7 @@ class InfoCommands(commands.Cog):
         # So, we only show emoji information if the preview string is within those bounds
         if 0 < len(emoji_preview) <= 1024:
             embed.add_field(name=text_lines['server_info']['titles']['emojis'].format(emoji_count),
-                            value=emoji_preview,
-                            inline=False)
+                            value=emoji_preview)
 
         await ctx.send(embed=embed)
 
