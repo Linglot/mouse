@@ -2,6 +2,8 @@ import asyncio
 import operator
 from collections import OrderedDict
 
+import discord
+
 import more_itertools
 from discord.ext import commands
 
@@ -44,7 +46,7 @@ class RoleCommands(commands.Cog):
             return
 
         server = ctx.guild
-        role = get_role(server, role_name)
+        role = discord.utils.find(lambda m: m.name.lower() == role_name.lower(), server.roles)
 
         if not await self.is_role_assignable(role):
             await send_error_embed(ctx, (text_lines['roles']['assign']['not_allowed'].format(role.name.title())))
@@ -234,7 +236,7 @@ class RoleCommands(commands.Cog):
 
         # Making some roles pingable and making a ping message
         for role in pinging_roles:
-            current_role = get_role(server, role)
+            current_role = discord.utils.find(lambda m: m.name.lower() == role.lower(), server.roles)
             if not current_role.mentionable:
                 await current_role.edit(mentionable=True)
                 gotta_change_later.append(role)
@@ -246,7 +248,7 @@ class RoleCommands(commands.Cog):
 
         # We gotta change back some of roles to unpingable
         for role in gotta_change_later:
-            current_role = get_role(server, role)
+            current_role = discord.utils.find(lambda m: m.name.lower() == role.lower(), server.roles)
             await current_role.edit(mentionable=False)
 
     # Top 10 roles command

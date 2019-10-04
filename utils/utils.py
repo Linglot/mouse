@@ -18,9 +18,5 @@ async def send_info_embed(ctx, message):
     await ctx.send(embed=embed)
 
 
-def get_role(server, role_name):
-    return discord.utils.find(lambda m: m.name.lower() == role_name.lower(), server.roles)
-
-
 def is_mod(member):
     return any([role in MOD_ROLES for role in member.roles])
