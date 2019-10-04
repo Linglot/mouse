@@ -70,7 +70,7 @@ class InfoCommands(commands.Cog):
         #                 inline=True)
 
         # Otherwise it will crash
-        if len(v_emoji) <= 1024:
+        if 0 < len(v_emoji) <= 1024:
             embed.add_field(name=text_lines['server_info']['titles']['emojis'].format(v_emoji_total),
                             value=v_emoji,
                             inline=False)
