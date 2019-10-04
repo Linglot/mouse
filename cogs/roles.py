@@ -279,7 +279,7 @@ class RoleCommands(commands.Cog):
     # Searches for roles with less than X members
     # Syntax: ;lessthan 10
     @commands.command(aliases=["lessthan", "less"])
-    # @commands.has_any_role(*ADMIN_ROLES)
+    @commands.has_any_role(*ADMIN_ROLES)
     @commands.guild_only()
     async def less_than(self, ctx, *args):
         roles = ctx.guild.roles
@@ -292,9 +292,8 @@ class RoleCommands(commands.Cog):
         if target > settings['roles']['less_than']['limit']:
             await send_error_embed(ctx, text_lines['roles']['less_than']['too_big'])
             return
-
         # Too sumarru nambaru?
-        if target <= 0:
+        elif target <= 0:
             await send_error_embed(ctx, text_lines['roles']['less_than']['too_small'])
             return
 
