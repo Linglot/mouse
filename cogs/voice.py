@@ -6,14 +6,14 @@ from utils.utils import *
 
 
 class VoiceCommands(commands.Cog):
-    reset_lang_aliases = ['resetlang', 'rl', 'reset']
+    RESET_LANG_ALIASES = ['resetlang', 'rl', 'reset']
 
     def __init__(self, bot):
         self.bot = bot
 
     # Command for changing VC's language in title
     # Syntax: ;lang Language Name
-    @commands.command(name='language', aliases=['lang', 'l', *reset_lang_aliases])
+    @commands.command(name='language', aliases=['lang', 'l', *RESET_LANG_ALIASES])
     @commands.guild_only()
     async def change_vc_name(self, ctx, *args):
         lang_name = " ".join(args).title()
@@ -31,7 +31,7 @@ class VoiceCommands(commands.Cog):
         vc = ctx.author.voice.channel
 
         # If we get "reset" then we're going to use another function
-        if lang_name.strip() == "reset" or ctx.invoked_with in self.reset_lang_aliases:
+        if lang_name.strip() == "reset" or ctx.invoked_with in self.RESET_LANG_ALIASES:
             await self.reset_name(vc)
             await send_info_embed(ctx, text_lines['voice']['reset'].format(self.get_original_name(vc.name)))
             return
