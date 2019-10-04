@@ -1,8 +1,10 @@
 from cogs.voice import VoiceCommands
 from settings.config import settings
 from utils.logger import logger
-from utils.utils import get_text_channel, is_mod
+from utils.utils import is_mod
 from discord.ext.commands import Cog
+from discord.utils import find
+
 
 class Events(Cog):
     def __init__(self, bot):
@@ -35,8 +37,8 @@ class Events(Cog):
 
     # Sets read&write permissions for a specified channel with given value. Returns true if succeed
     async def set_permissions_to(self, server, channel, member, value, reason=''):
-        name = VoiceCommands.get_original_name(channel.name)
-        channel = get_text_channel(server, name + '-text')
+        name = VoiceCommands.get_original_name(channel.name).lower()
+        channel = find(lambda c: c.name.lower() == name + '-text', server.channels)
         if channel is not None:
             await channel.set_permissions(member, reason=reason, read_messages=value, send_messages=value)
             return True

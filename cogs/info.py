@@ -23,7 +23,6 @@ class InfoCommands(commands.Cog):
         without_roles = len([member for member in server.members if len(member.roles) == 1])
 
         # All the calculations and stuff
-        v_owner = get_full_name(server.owner)
         v_roles = text_lines['server_info']['roles'].format(language_roles, len(server.roles) - language_roles)
         # v_features = ", ".join(server.features) if len(server.features) > 0 else text_lines['technical']['none']
         v_default_channel = server.system_channel.mention if server.system_channel else text_lines['technical']['none']
@@ -47,7 +46,7 @@ class InfoCommands(commands.Cog):
                         value=server.id,
                         inline=True)
         embed.add_field(name=text_lines['server_info']['titles']['owner'],
-                        value=v_owner,
+                        value=server.owner,
                         inline=True)
         embed.add_field(name=text_lines['server_info']['titles']['created_at'],
                         value=v_created_at,
