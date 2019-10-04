@@ -17,26 +17,34 @@ class InfoCommands(commands.Cog):
     @commands.guild_only()
     async def server_info(self, ctx):
         server = ctx.message.guild
-        language_roles = len([role for role in server.roles if role in LANGUAGE_ROLES])
-        without_roles = len([member for member in server.members if len(member.roles) == 1])
 
-        # All the calculations and stuff
-        v_roles = text_lines['server_info']['roles'].format(language_roles, len(server.roles) - language_roles)
-        # v_features = ", ".join(server.features) if len(server.features) > 0 else text_lines['technical']['none']
-        v_default_channel = server.system_channel.mention if server.system_channel else text_lines['technical']['none']
-        v_created_at = server.created_at.strftime("%H:%M:%S at %d %b %Y")
-        v_members_total = len(server.members)
-        v_members = text_lines['server_info']['members_line'].format(v_members_total - without_roles, without_roles)
-        v_emoji_total = len(server.emojis)
-        v_emoji = "".join([str(emoji) for emoji in server.emojis])  # This is a string of *all* emojis in the server
+        # Get number of language roles on the server
+        language_role_count = len(list(filter(lambda role: role in LANGUAGE_ROLES, server.roles)))
+
+        # Get number of users without any roles on the server
+        # Every user is implicitly in `@everyone`, which is why we check if `len(member.roles) == 1`
+        roleless_user_count = len(list(filter(lambda member: len(member.roles) == 1, server.members)))
+
+        role_info = text_lines['server_info']['roles'].format(language_role_count,
+                                                              len(server.roles) - language_role_count)
+
+        # TODO: Determine if guilds can be without a default channel
+        default_channel = server.system_channel.mention if server.system_channel else text_lines['technical']['none']
+
+        total_members = len(server.members)
+        member_info = text_lines['server_info']['members_line'].format(total_members - roleless_user_count,
+                                                                       roleless_user_count)
+
+        emoji_count = len(server.emojis)
+        # This is a string of *all* custom emojis in the server
+        emoji_preview = "".join([str(emoji) for emoji in server.emojis])
 
         # Counts the number of text and voice channels in the server
         text_channel_count = len(list(filter(lambda channel: isinstance(channel, TextChannel), server.channels)))
         voice_channel_count = len(server.channels) - text_channel_count
+        channel_info = text_lines['server_info']['channel_line'].format(text_channel_count, voice_channel_count)
 
-        v_channels = text_lines['server_info']['channel_line'].format(text_channel_count, voice_channel_count)
-
-        # Creating table
+        # Create table for server info
         embed = discord.Embed(colour=discord.Colour(INFO_COLOR))
         embed.set_thumbnail(url=server.icon_url)
         embed.set_author(name=server.name, icon_url=server.icon_url)
@@ -47,32 +55,30 @@ class InfoCommands(commands.Cog):
                         value=server.owner,
                         inline=True)
         embed.add_field(name=text_lines['server_info']['titles']['created_at'],
-                        value=v_created_at,
+                        value=server.created_at.strftime("%H:%M:%S at %d %b %Y"),
                         inline=True)
         embed.add_field(name=text_lines['server_info']['titles']['region'],
                         value=server.region,
                         inline=True)
         embed.add_field(name=text_lines['server_info']['titles']['channels'].format(len(server.channels)),
-                        value=v_channels,
+                        value=channel_info,
                         inline=True)
         embed.add_field(name=text_lines['server_info']['titles']['default_channel'],
-                        value=v_default_channel,
+                        value=default_channel,
                         inline=True)
         embed.add_field(name=text_lines['server_info']['titles']['roles'].format(len(server.roles)),
-                        value=v_roles,
+                        value=role_info,
                         inline=True)
-        embed.add_field(name=text_lines['server_info']['titles']['members'].format(v_members_total),
-                        value=v_members,
+        embed.add_field(name=text_lines['server_info']['titles']['members'].format(total_members),
+                        value=member_info,
                         inline=True)
 
-        # embed.add_field(name=text_lines['server_info']['titles']['features'],
-        #                 value=v_features,
-        #                 inline=True)
-
-        # Otherwise it will crash
-        if 0 < len(v_emoji) <= 1024:
-            embed.add_field(name=text_lines['server_info']['titles']['emojis'].format(v_emoji_total),
-                            value=v_emoji,
+        # The max length for content in an embed is 1024 characters, and the minimum length is 1 character
+        # If the emoji preview string is empty, or greater than 1024 characters, discord will reject our content
+        # So, we only show emoji information if the preview string is within those bounds
+        if 0 < len(emoji_preview) <= 1024:
+            embed.add_field(name=text_lines['server_info']['titles']['emojis'].format(emoji_count),
+                            value=emoji_preview,
                             inline=False)
 
         await ctx.send(embed=embed)
