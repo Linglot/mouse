@@ -1,6 +1,7 @@
-import asyncio
 import discord
 import operator
+
+from asyncio import TimeoutError
 
 from more_itertools import divide
 from discord.ext import commands
@@ -381,14 +382,11 @@ class RoleCommands(commands.Cog):
         await msg.add_reaction(YES_EMOJI)
         await msg.add_reaction(NO_EMOJI)
 
-        def check(c_reaction, c_user):
-            return c_reaction.message.id == msg.id and c_user == ctx.author
-
         try:
             reaction, user = await self.bot.wait_for('reaction_add',
                                                      timeout=settings['roles']['assign']['emoji_cd'],
-                                                     check=check)
-        except asyncio.TimeoutError:
+                                                     check=lambda r, u: r.message.id == msg.id and u == ctx.author)
+        except TimeoutError:
             await msg.clear_reactions()
         else:
             if reaction.emoji == YES_EMOJI:
