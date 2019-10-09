@@ -3,7 +3,7 @@
 I.e. in 'My name is {}' it gets changed automatically to user's name.
 After each line with a placeholder there's a comment with its 'future' content.
 """
-from settings.constants import GITHUB_LINK, INV_LINK, NO_EMOJI, YES_EMOJI
+from settings.constants import GITHUB_LINK, INVITE_LINK, NO_EMOJI, YES_EMOJI
 
 text_lines = {
     ##############  IMPORTANT  ###############
@@ -28,12 +28,13 @@ text_lines = {
             'keep': 'You already had **{}** and opted to keep it.',  # Role name
             'already_have_title': 'You already have this role',
             'already_have_msg':
-                '''React with {} to remove it or react with {} if you don\'t want to do that.
-                _Ignoring this message is also an option if you don't wanna remove it_'''.format(YES_EMOJI, NO_EMOJI),
+                f'''React with {YES_EMOJI} to remove it or react with {NO_EMOJI} if you don\'t want to do that.
+                _Ignoring this message is also an option if you don't wanna remove it_''',
             'not_allowed': 'You can\'t self-assign this role',
             'empty': '''Give me the role name
                         `;role native english` for example''',
-            'cant_remove_native': 'Did you add the wrong native tag? Add your actual native language first, then remove the incorrect tag.',
+            'cant_remove_native': 'Did you add the wrong native tag? Add your actual native language first, then'
+                                  ' remove the incorrect tag.',
             'dont_have': 'You have to assign the role before removing it',
             'native_first':
                 '''**Sorry bro, you need to tag your native language first.**
@@ -96,12 +97,10 @@ text_lines = {
         'about_desc': 'Heyo! This bot was developed specially for the Linglot server. '
                       'If you have any suggestions or bug reports, please contact the server staff.',
         'about_gh_link': ':notepad_spiral: Github',
-        'about_gh_desc': 'If you want to help us with our bot, or just look at our ~~crappy~~ code,'
-                         'you can do it [here]({})'
-            .format(GITHUB_LINK),
+        'about_gh_desc': 'If you want to help us with our bot, or just look at our ~~crappy~~ code,' 
+                         f'you can do it [here]({GITHUB_LINK})',
         'about_inv_link': ':u6708: Linguistic lot',
-        'about_inv_desc': 'Here\'s an [invite link]({}) for you, if you want to join our server'
-            .format(INV_LINK)
+        'about_inv_desc': f'Here\'s an [invite link]({INVITE_LINK}) for you, if you want to join our server'
     },
 
     # Text lines for ;version command

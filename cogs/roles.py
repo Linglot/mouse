@@ -1,17 +1,20 @@
-import asyncio
+import discord
 import operator
-from collections import OrderedDict
 
-import more_itertools
+from asyncio import TimeoutError
+
+from more_itertools import divide
 from discord.ext import commands
 
 from settings.config import settings
-from settings.constants import MAIN_COLOR, ADMIN_ROLES, NATIVE_COLOR, YES_EMOJI, NO_EMOJI
+from settings.constants import MAIN_COLOR, ADMIN_ROLES, NATIVE_COLOR, YES_EMOJI, NO_EMOJI, INFO_COLOR
 from settings.lines import text_lines
-from utils.utils import *
+
+from utils.utils import send_error_embed
 
 
-class RoleCommands:
+class RoleCommands(commands.Cog):
+    LANGUAGE_COMMAND_ALIASES = ['native', 'fluent', 'learning']
 
     def __init__(self, bot):
         self.bot = bot
@@ -19,35 +22,35 @@ class RoleCommands:
     # Command for role assigning.
     # It has multiple aliases which are adding either "native", "fluent", or "learning".
     # ;role alias is a normal one and can be used for any role basically.
-    @commands.command(aliases=['role', 'native', 'fluent', 'learning', 'not'])
+    @commands.command(aliases=['role', 'not', *LANGUAGE_COMMAND_ALIASES])
     @commands.guild_only()
     async def role_assign(self, ctx, *args):
-        role_name = ' '.join(args).title()
+        role_name = ' '.join(args).strip().title()
         called_with = ctx.invoked_with
 
-        if len(role_name.strip()) <= 0:
-            await send_error_embed(ctx, (text_lines['roles']['assign']['empty']))
+        if len(role_name) <= 0:
+            await send_error_embed(ctx, text_lines['roles']['assign']['empty'])
             return
 
         # We have to add some strings to make aliases searchable
-        if called_with == 'native' or called_with == 'fluent' or called_with == 'learning':
+        if called_with in self.LANGUAGE_COMMAND_ALIASES:
             role_name = called_with.title() + ' ' + role_name
 
         splitted_name = role_name.split(' ')
 
-        if splitted_name[0].lower() == 'native' or splitted_name[0].lower() == 'fluent':
+        if role_name.startswith(('native', 'fluent')):
             if await self.is_role_exist(ctx, splitted_name[1]):
                 role_name = splitted_name[1]
 
         if not await self.is_role_exist(ctx, role_name):
-            await send_error_embed(ctx, (text_lines['roles']['search']['no_role'].format(role_name.title())))
+            await send_error_embed(ctx, text_lines['roles']['search']['no_role'].format(role_name.title()))
             return
 
         server = ctx.guild
-        role = get_role(server, role_name)
+        role = discord.utils.find(lambda m: m.name.lower() == role_name.lower(), server.roles)
 
         if not await self.is_role_assignable(role):
-            await send_error_embed(ctx, (text_lines['roles']['assign']['not_allowed'].format(role.name.title())))
+            await send_error_embed(ctx, text_lines['roles']['assign']['not_allowed'].format(role.name.title()))
             return
 
         user = ctx.author
@@ -55,7 +58,7 @@ class RoleCommands:
         # If a user has this role, we will remove it
         if role in user.roles:
             if role.color.value == NATIVE_COLOR and await self.will_become_nativeless(ctx):
-                await send_error_embed(ctx, (text_lines['roles']['assign']['cant_remove_native']))
+                await send_error_embed(ctx, text_lines['roles']['assign']['cant_remove_native'])
                 return
 
             if called_with == 'not':
@@ -70,7 +73,7 @@ class RoleCommands:
         elif called_with != 'not':
             # If a used doesn't have a native role we tell him to do that first
             if not await self.has_native_role(ctx) and role.color.value != NATIVE_COLOR:
-                await send_error_embed(ctx, (text_lines['roles']['assign']['native_first']))
+                await send_error_embed(ctx, text_lines['roles']['assign']['native_first'])
                 return
 
             await user.add_roles(role, reason='self-added')
@@ -136,7 +139,8 @@ class RoleCommands:
             # if there's more than 30 users, we don't need to display the others
             # Also this is NOT(!) a changeable option due to discord limits
             if number_of_results > 30:
-                found_users = [user for i, user in enumerate(found_users) if i < 30]
+                found_users = found_users[:30]
+
                 excluded = number_of_results - 30
                 embed.set_footer(text=text_lines['roles']['search']['and_more'].format(excluded))
 
@@ -176,7 +180,7 @@ class RoleCommands:
         # Counting the combination of peeps
         for member in server.members:
             user_roles = [str(role).lower() for role in member.roles]
-            if set(searching_roles).issubset(user_roles):
+            if searching_roles.issubset(user_roles):
                 users_in_combination += 1
 
         # Looking for peeps
@@ -234,7 +238,7 @@ class RoleCommands:
 
         # Making some roles pingable and making a ping message
         for role in pinging_roles:
-            current_role = get_role(server, role)
+            current_role = discord.utils.find(lambda m: m.name.lower() == role.lower(), server.roles)
             if not current_role.mentionable:
                 await current_role.edit(mentionable=True)
                 gotta_change_later.append(role)
@@ -246,7 +250,7 @@ class RoleCommands:
 
         # We gotta change back some of roles to unpingable
         for role in gotta_change_later:
-            current_role = get_role(server, role)
+            current_role = discord.utils.find(lambda m: m.name.lower() == role.lower(), server.roles)
             await current_role.edit(mentionable=False)
 
     # Top 10 roles command
@@ -281,27 +285,25 @@ class RoleCommands:
     async def less_than(self, ctx, *args):
         roles = ctx.guild.roles
         try:
-            x = int("".join(args))
-        except:
-            await send_error_embed(ctx, (text_lines['roles']['less_than']['not_number']))
-            return
+            target = int("".join(args))
+        except ValueError:
+            return await send_error_embed(ctx, text_lines['roles']['less_than']['not_number'])
 
         # Too biggu nambaru?
-        if x > settings['roles']['less_than']['limit']:
-            await send_error_embed(ctx, (text_lines['roles']['less_than']['too_big']))
+        if target > settings['roles']['less_than']['limit']:
+            await send_error_embed(ctx, text_lines['roles']['less_than']['too_big'])
             return
-
         # Too sumarru nambaru?
-        if x <= 0:
-            await send_error_embed(ctx, (text_lines['roles']['less_than']['too_small']))
+        elif target <= 0:
+            await send_error_embed(ctx, text_lines['roles']['less_than']['too_small'])
             return
 
-        output = {role.name: len(role.members) for role in roles if len(role.members) < x}
+        output = {role.name: len(role.members) for role in roles if len(role.members) < target}
         results = sorted(output.items(), reverse=True, key=operator.itemgetter(1))
         line = ', '.join([f"[{v}] {k}" for k, v in results])
 
         embed = discord.Embed(colour=discord.Colour(MAIN_COLOR),
-                              title=text_lines['roles']['less_than']['title'].format(x),
+                              title=text_lines['roles']['less_than']['title'].format(target),
                               description=line)
 
         await ctx.send(embed=embed)
@@ -310,19 +312,15 @@ class RoleCommands:
 
     # Basics check for commands if your want to check multiple roles
     async def multirole_checks(self, ctx, role_list) -> bool:
-        if not await self.check_search_limit(role_list):
-            await send_error_embed(ctx, (text_lines['roles']['search']['limit'].format(
-                str(settings['roles']['search']['limit']))))
+        if not 1 <= len(role_list) <= settings['roles']['search']['limit']:
+            await send_error_embed(ctx, text_lines['roles']['search']['limit']
+                                   .format(settings['roles']['search']['limit']))
             return False
 
         if not await self.is_role_exist(ctx, role_list, output=True):
             return False
 
         return True
-
-    # No or too many roles given equals "Bye"
-    async def check_search_limit(self, role_list) -> bool:
-        return 1 <= len(role_list) <= settings['roles']['search']['limit']
 
     # Do(es) certain role(s) even exist?
     async def is_role_exist(self, ctx, role_list, output=False) -> bool:
@@ -335,7 +333,7 @@ class RoleCommands:
         for role in role_list:
             if role.lower() not in server_roles:
                 if output:
-                    await send_error_embed(ctx, (text_lines['roles']['search']['no_role'].format(role)))
+                    await send_error_embed(ctx, text_lines['roles']['search']['no_role'].format(role))
                 return False
 
         return True
@@ -384,14 +382,11 @@ class RoleCommands:
         await msg.add_reaction(YES_EMOJI)
         await msg.add_reaction(NO_EMOJI)
 
-        def check(c_reaction, c_user):
-            return c_reaction.message.id == msg.id and c_user == ctx.author
-
         try:
             reaction, user = await self.bot.wait_for('reaction_add',
                                                      timeout=settings['roles']['assign']['emoji_cd'],
-                                                     check=check)
-        except asyncio.TimeoutError:
+                                                     check=lambda r, u: r.message.id == msg.id and u == ctx.author)
+        except TimeoutError:
             await msg.clear_reactions()
         else:
             if reaction.emoji == YES_EMOJI:
@@ -410,14 +405,14 @@ class RoleCommands:
     # Divides list into N evenly-sized chunks
     @staticmethod
     def __create_chunks(list_to_divide, number_of_chunks):
-        return [list(c) for c in more_itertools.divide(number_of_chunks, list_to_divide)]
+        return [list(c) for c in divide(number_of_chunks, list_to_divide)]
 
     # Dividing roles to a list, removing unnecessary spaces and making it lowercase
     # "  native english,    fluent english " -> ["native english", "fluent english"]
     @staticmethod
     def make_role_list(role_string):
-        result = [role.strip().lower() for role in " ".join(role_string).split(",") if role.strip() != ""]
-        return list(OrderedDict.fromkeys(result))
+        # converts to a `set` to ensure no duplicates
+        return set([role.strip().lower() for role in " ".join(role_string).split(",") if role.strip() != ""])
 
     # Add a … symbol if the is longer than "limit"
     @staticmethod

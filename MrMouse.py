@@ -2,7 +2,7 @@ from discord.ext.commands import Bot
 
 from settings.config import TOKEN, PREFIX
 
-bot = Bot(command_prefix=PREFIX)
+bot = Bot(command_prefix=PREFIX, fetch_offline_members=True)
 
 extensions = [
     # Commands
@@ -33,4 +33,4 @@ if __name__ == "__main__":
         bot.load_extension(extension)
         print("Extensions: {} module was loaded.".format(extension))
 
-bot.run(TOKEN, bot=True, reconnect=True, fetch_offline_members=True)
+bot.run(TOKEN, bot=True, reconnect=True)
