@@ -4,9 +4,12 @@ import discord
 from discord.ext import commands
 
 from settings.config import settings
-from settings.constants import ASSIGNABLE_ROLE_COLORS, NATIVE_COLOR, YES_EMOJI, INFO_COLOR, MAIN_COLOR, NO_EMOJI
+from settings.constants import ASSIGNABLE_ROLE_COLORS, NATIVE_COLOR, YES_EMOJI, INFO_COLOR, MAIN_COLOR, NO_EMOJI, \
+    ADMIN_ROLES
 from settings.lines import text_lines
 from utils.utils import send_error_embed
+
+from functools import reduce
 
 
 class LinglotRole(commands.RoleConverter):
@@ -33,7 +36,7 @@ class LinglotRoleList(LinglotRole):
         roles_new = []
         for role in roles:
             roles_new.append(await super().convert(ctx, role.strip()))
-        return roles_new
+        return set(sorted(roles_new))  # Convert to a set here to ensure no duplicates
 
 
 class RoleCommands(commands.Cog):
@@ -100,7 +103,61 @@ class RoleCommands(commands.Cog):
     @commands.command(name='count')
     @commands.guild_only()
     async def count_command(self, ctx: commands.Context, *, roles: LinglotRoleList):
-        await ctx.send(', '.join(roles))
+        if len(roles) > settings['roles']['search']['limit']:
+            return await send_error_embed(ctx, text_lines['roles']['search']['limit']
+                                          .format(settings['roles']['search']['limit']))
+
+        total = sum(roles.issubset(user.roles) for user in ctx.guild.members)
+
+        embed_body = ''
+
+        for role in roles:
+            users_in_role = sum(role in user.roles for user in ctx.guild.members)
+            embed_body += text_lines['roles']['count']['total'].format(role.name, users_in_role)
+
+        role_names = ', '.join(role.name for role in roles)
+        if total <= 0:
+            embed_title = text_lines['roles']['count']['no_users'].format(role_names)
+        elif total == 1:
+            embed_title = text_lines['roles']['count']['one_user'].format(role_names)
+        else:
+            embed_title = text_lines['roles']['count']['x_users'].format(total, role_names)
+
+        embed = discord.Embed(title=embed_title,
+                              color=discord.Color(MAIN_COLOR))
+        if len(roles) > 1:
+            embed.description = embed_body
+
+        await ctx.send(embed=embed)
+
+    @commands.command(name='search')
+    @commands.guild_only()
+    async def search_command(self, ctx: commands.Context, *, roles: LinglotRoleList):
+        pass
+
+    @count_command.error
+    @search_command.error
+    async def role_search_error(self, ctx: commands.Context, error):
+        if isinstance(error, commands.BadArgument):
+            await send_error_embed(ctx, 'Sorry, one or more of those roles does not exist!')
+
+    @commands.command(name='ping')
+    @commands.has_any_role(*ADMIN_ROLES)
+    @commands.cooldown(rate=1, per=settings['roles']['ping']['cooldown'], type=commands.BucketType.user)
+    @commands.guild_only()
+    async def ping_command(self, ctx: commands.Context, *, roles: LinglotRoleList):
+        pass
+
+    @commands.command(name='top10', aliases=['top'])
+    @commands.guild_only()
+    async def top_roles_command(self, ctx: commands.Context):
+        pass
+
+    @commands.command(name='lessthan', aliases=['less'])
+    @commands.has_any_role(*ADMIN_ROLES)
+    @commands.guild_only()
+    async def lessthan_command(self, ctx: commands.Context, target_size: int):
+        pass
 
     async def yes_no_dialogue(self, ctx, role):
         # TODO: fix this trash fire
