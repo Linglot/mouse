@@ -9,8 +9,6 @@ from settings.constants import ASSIGNABLE_ROLE_COLORS, NATIVE_COLOR, YES_EMOJI, 
 from settings.lines import text_lines
 from utils.utils import send_error_embed
 
-from functools import reduce
-
 
 class LinglotRole(commands.RoleConverter):
     async def convert(self, ctx, argument):
@@ -157,7 +155,13 @@ class RoleCommands(commands.Cog):
     @commands.has_any_role(*ADMIN_ROLES)
     @commands.guild_only()
     async def lessthan_command(self, ctx: commands.Context, target_size: int):
-        pass
+        if 0 <= target_size < settings['roles']['less_than']['limit']:
+            await send_error_embed(ctx, 'Number out of range')
+
+    @lessthan_command.error
+    async def lessthan_error(self, ctx, error):
+        if isinstance(error, commands.BadArgument):
+            return await send_error_embed(ctx, 'You must pass a number to this command')
 
     async def yes_no_dialogue(self, ctx, role):
         # TODO: fix this trash fire
