@@ -25,7 +25,7 @@ class RoleCommands(commands.Cog):
     @commands.command(aliases=['role', 'not', *LANGUAGE_COMMAND_ALIASES])
     @commands.guild_only()
     async def role_assign(self, ctx, *args):
-        role_name = ' '.join(args).strip().title()
+        role_name = ' '.join(args).strip().title().lower()
         called_with = ctx.invoked_with
 
         if len(role_name) <= 0:
@@ -34,7 +34,7 @@ class RoleCommands(commands.Cog):
 
         # We have to add some strings to make aliases searchable
         if called_with in self.LANGUAGE_COMMAND_ALIASES:
-            role_name = called_with.title() + ' ' + role_name
+            role_name = called_with + ' ' + role_name
 
         splitted_name = role_name.split(' ')
 
