@@ -1,3 +1,4 @@
+import operator
 from typing import Union
 
 import discord
@@ -45,6 +46,7 @@ class RoleCommands(commands.Cog):
                       aliases=['native', 'fluent', 'learning'])
     @commands.guild_only()
     async def role_command(self, ctx: commands.Context, *, role: Union[LinglotRole, LinglotLanguageRole]):
+        # noinspection PyTypeChecker
         if not self.is_assignable_role(role):
             # Role isn't self-assignable
             return await send_error_embed(ctx, text_lines['roles']['assign']['not_allowed'])
@@ -67,6 +69,7 @@ class RoleCommands(commands.Cog):
     @commands.command(name='not')
     @commands.guild_only()
     async def role_remove_command(self, ctx: commands.Context, *, role: LinglotRole):
+        # noinspection PyTypeChecker
         if not self.is_assignable_role(role):
             # Role isn't self-assignable
             return await send_error_embed(ctx, text_lines['roles']['assign']['not_allowed'])
@@ -86,6 +89,7 @@ class RoleCommands(commands.Cog):
     @role_command.error
     @role_remove_command.error
     async def role_error(self, ctx: commands.Context, error):
+        # User provided
         if isinstance(error, commands.BadArgument):
             await send_error_embed(ctx, error.args[0])
 
@@ -101,18 +105,23 @@ class RoleCommands(commands.Cog):
     @commands.command(name='count')
     @commands.guild_only()
     async def count_command(self, ctx: commands.Context, *, roles: LinglotRoleList):
+        # noinspection PyTypeChecker
         if len(roles) > settings['roles']['search']['limit']:
             return await send_error_embed(ctx, text_lines['roles']['search']['limit']
                                           .format(settings['roles']['search']['limit']))
 
+        # Find total users who have *all* of the provided roles
         total = sum(roles.issubset(user.roles) for user in ctx.guild.members)
 
         embed_body = ''
 
+        # noinspection PyTypeChecker
+        # Generate a list of how many users have *each* role
         for role in roles:
             users_in_role = sum(role in user.roles for user in ctx.guild.members)
             embed_body += text_lines['roles']['count']['total'].format(role.name, users_in_role)
 
+        # noinspection PyTypeChecker
         role_names = ', '.join(role.name for role in roles)
         if total <= 0:
             embed_title = text_lines['roles']['count']['no_users'].format(role_names)
@@ -123,6 +132,8 @@ class RoleCommands(commands.Cog):
 
         embed = discord.Embed(title=embed_title,
                               color=discord.Color(MAIN_COLOR))
+        # noinspection PyTypeChecker
+        # If we're looking for a combination of roles, put the totals for each role in the embed body
         if len(roles) > 1:
             embed.description = embed_body
 
@@ -131,6 +142,7 @@ class RoleCommands(commands.Cog):
     @commands.command(name='search')
     @commands.guild_only()
     async def search_command(self, ctx: commands.Context, *, roles: LinglotRoleList):
+        # TODO
         pass
 
     @count_command.error
@@ -139,26 +151,73 @@ class RoleCommands(commands.Cog):
         if isinstance(error, commands.BadArgument):
             await send_error_embed(ctx, 'Sorry, one or more of those roles does not exist!')
 
-    @commands.command(name='ping')
-    @commands.has_any_role(*ADMIN_ROLES)
-    @commands.cooldown(rate=1, per=settings['roles']['ping']['cooldown'], type=commands.BucketType.user)
+    # we specify cooldown_after_parsing=True so that ping commands that fail due to non-existent roles don't trigger
+    # a cooldown
+    @commands.command(name='ping', cooldown_after_parsing=True)
+    @commands.has_any_role('Event Host', 'Bot dev', *ADMIN_ROLES)
+    @commands.cooldown(rate=1,
+                       per=settings['roles']['ping']['cooldown'],
+                       type=commands.BucketType.user)
     @commands.guild_only()
     async def ping_command(self, ctx: commands.Context, *, roles: LinglotRoleList):
-        pass
+        # Make sure the user is not trying to ping any blacklisted roles
+        # noinspection PyTypeChecker
+        if any([role.name in settings['roles']['ping']['blacklist'] for role in roles]):
+            return await send_error_embed(ctx, 'Sorry, one or more of those roles is not ping-able!')
+
+        # noinspection PyTypeChecker
+        await ctx.send(f"PING! {ctx.author.mention} is pinging {', '.join(role.mention for role in roles)}")
+
+    @ping_command.error
+    async def ping_error(self, ctx: commands.Context, error):
+        # User did not provide a valid list of roles
+        if isinstance(error, commands.BadArgument):
+            await send_error_embed(ctx, 'Sorry, one or more of those roles does not exist!')
+
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await send_error_embed(ctx, 'Sorry, you need to provide at least one role to ping')
+
+        elif isinstance(error, commands.CommandOnCooldown):
+            # If the command is on cooldown, but the person trying to use it is an admin...
+            if self.user_is_admin(ctx.message.author):
+                # ... then bypass the cooldown and let them use it!
+                await ctx.reinvoke()
+            else:
+                await send_error_embed(ctx, 'Sorry, this command is on cooldown!')
 
     @commands.command(name='top10', aliases=['top'])
     @commands.guild_only()
     async def top_roles_command(self, ctx: commands.Context):
+        # TODO
         pass
 
     @commands.command(name='lessthan', aliases=['less'])
     @commands.has_any_role(*ADMIN_ROLES)
     @commands.guild_only()
-    async def lessthan_command(self, ctx: commands.Context, target_size: int):
-        if 0 <= target_size < settings['roles']['less_than']['limit']:
-            await send_error_embed(ctx, 'Number out of range')
+    async def less_than_command(self, ctx: commands.Context, target_size: int):
 
-    @lessthan_command.error
+        # make sure the target role size is within the right limits
+        if target_size <= 0 or target_size > settings['roles']['less_than']['limit']:
+            return await send_error_embed(ctx, 'Number out of range')
+
+        # Basically generate the list, greatest to least, of the roles with less than `target_size` members
+        output = {role.name: len(role.members) for role in ctx.guild.roles if len(role.members) < target_size}
+        results = sorted(output.items(), reverse=True, key=operator.itemgetter(1))
+        line = ', '.join([f"[{v}] {k}" for k, v in results])
+
+        # The list of roles has the potential to be over 2000 characters,
+        # which is the max amount of characters discord allows you to send
+        # in a message.
+        if len(line) > 2000:
+            line = line[:1996] + '...'
+
+        embed = discord.Embed(colour=discord.Colour(MAIN_COLOR),
+                              title=text_lines['roles']['less_than']['title'].format(target_size),
+                              description=line)
+
+        await ctx.send(embed=embed)
+
+    @less_than_command.error
     async def lessthan_error(self, ctx, error):
         if isinstance(error, commands.BadArgument):
             return await send_error_embed(ctx, 'You must pass a number to this command')
@@ -189,6 +248,17 @@ class RoleCommands(commands.Cog):
 
             await msg.edit(embed=embed)
             await msg.clear_reactions()
+
+    @staticmethod
+    def user_is_admin(member: discord.Member):
+        """
+        :param member: A discord guild member
+        :return: True if the user is a server admin, False otherwise
+        """
+        for role in member.roles:
+            if role.name.title() in ADMIN_ROLES:
+                return True
+        return False
 
     @staticmethod
     def is_assignable_role(role: discord.Role):
