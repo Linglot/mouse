@@ -11,6 +11,13 @@ from settings.lines import text_lines
 from utils.utils import send_error_embed
 
 
+# Basically, this lets us specify that a command requires a *valid role* as an argument.
+# We inherit RoleConverter, which makes sure that the passed argument is a *valid role*.
+# Language names on Linglot are usually "<level> <language>" (e.g. "Learning Italian", or "Learning Japanese"),
+# where the entire string is title-case. So, first we try the argument passed but forced to title-case.
+# If that's not a valid role, e.g. in the case of "Correct me!" it would try "Correct Me!" which is wrong, we try
+# just to capitalise the first letter of the argument and check if *that* is a valid role.
+# See https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html#advanced-converters
 class LinglotRole(commands.RoleConverter):
     async def convert(self, ctx, argument):
         try:
@@ -19,11 +26,13 @@ class LinglotRole(commands.RoleConverter):
             return await super().convert(ctx, argument.capitalize())
 
 
+# for ;native, ;fluent, and ;learning
 class LinglotLanguageRole(LinglotRole):
     async def convert(self, ctx: commands.Context, argument):
         try:
             return await super().convert(ctx, ctx.invoked_with + ' ' + argument)
         except commands.BadArgument as BA:
+            # some languages are merged and do not have separate native/fluent roles
             if ctx.invoked_with in ['native', 'fluent']:
                 return await super().convert(ctx, argument)
             raise BA
@@ -35,7 +44,8 @@ class LinglotRoleList(LinglotRole):
         roles_new = []
         for role in roles:
             roles_new.append(await super().convert(ctx, role.strip()))
-        return set(sorted(roles_new))  # Convert to a set here to ensure no duplicates
+        # Convert to a set here to ensure there are no duplicates
+        return set(sorted(roles_new))
 
 
 class RoleCommands(commands.Cog):
@@ -61,6 +71,7 @@ class RoleCommands(commands.Cog):
             if self.native_role_count(ctx.author) == 0 and role.color.value != NATIVE_COLOR:
                 # User does not have a native role, they should add one first!
                 return await send_error_embed(ctx, text_lines['roles']['assign']['native_first'])
+            # add the user to the role, then let them know it was successful
             await ctx.author.add_roles(role, reason='self-added')
             embed = discord.Embed(title=text_lines['roles']['assign']['added'].format(role.name),
                                   colour=discord.Colour(MAIN_COLOR))
@@ -75,9 +86,11 @@ class RoleCommands(commands.Cog):
             return await send_error_embed(ctx, text_lines['roles']['assign']['not_allowed'])
 
         if role not in ctx.author.roles:
+            # User does not have the role
             return await send_error_embed(ctx, text_lines['roles']['assign']['dont_have'])
 
         if self.native_role_count(ctx.author) == 1 and role.color.value == NATIVE_COLOR:
+            # User is trying to remove their only native role
             return await send_error_embed(ctx, text_lines['roles']['assign']['cant_remove_native'])
 
         await ctx.author.remove_roles(role, reason='self-removed')
@@ -89,13 +102,15 @@ class RoleCommands(commands.Cog):
     @role_command.error
     @role_remove_command.error
     async def role_error(self, ctx: commands.Context, error):
-        # User provided
+        # User provided a non-existent role to ;not
         if isinstance(error, commands.BadArgument):
             await send_error_embed(ctx, error.args[0])
 
+        # User didn't provide any roles
         elif isinstance(error, commands.MissingRequiredArgument):
             await send_error_embed(ctx, text_lines['roles']['assign']['empty'])
 
+        # User provided a non-existent role to ;role or ;fluent or ;native
         elif isinstance(error, commands.BadUnionArgument):
             role: str = ctx.message.content.replace(ctx.prefix + ctx.invoked_with + ' ', '')
             if ctx.invoked_with in ['fluent', 'native']:
@@ -148,11 +163,16 @@ class RoleCommands(commands.Cog):
     @count_command.error
     @search_command.error
     async def role_search_error(self, ctx: commands.Context, error):
+        # user provided one or more non-existent roles
         if isinstance(error, commands.BadArgument):
             await send_error_embed(ctx, 'Sorry, one or more of those roles does not exist!')
 
-    # we specify cooldown_after_parsing=True so that ping commands that fail due to non-existent roles don't trigger
-    # a cooldown
+        # user provided no roles
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await send_error_embed(ctx, 'You must provide one or more roles for this command!')
+
+    # we specify cooldown_after_parsing=True so that ping commands that fail due to non-existent roles, or no arguments,
+    # don't trigger a cooldown,
     @commands.command(name='ping', cooldown_after_parsing=True)
     @commands.has_any_role('Event Host', 'Bot dev', *ADMIN_ROLES)
     @commands.cooldown(rate=1,
@@ -174,9 +194,11 @@ class RoleCommands(commands.Cog):
         if isinstance(error, commands.BadArgument):
             await send_error_embed(ctx, 'Sorry, one or more of those roles does not exist!')
 
+        # user provided no roles
         elif isinstance(error, commands.MissingRequiredArgument):
             await send_error_embed(ctx, 'Sorry, you need to provide at least one role to ping')
 
+        # User is hitting cooldown for this command
         elif isinstance(error, commands.CommandOnCooldown):
             # If the command is on cooldown, but the person trying to use it is an admin...
             if self.user_is_admin(ctx.message.author):
@@ -200,14 +222,14 @@ class RoleCommands(commands.Cog):
         if target_size <= 0 or target_size > settings['roles']['less_than']['limit']:
             return await send_error_embed(ctx, 'Number out of range')
 
-        # Basically generate the list, greatest to least, of the roles with less than `target_size` members
+        # generate the list, greatest to least, of the roles with less than `target_size` members
         output = {role.name: len(role.members) for role in ctx.guild.roles if len(role.members) < target_size}
         results = sorted(output.items(), reverse=True, key=operator.itemgetter(1))
         line = ', '.join([f"[{v}] {k}" for k, v in results])
 
-        # The list of roles has the potential to be over 2000 characters,
-        # which is the max amount of characters discord allows you to send
-        # in a message.
+        # The list of roles has the potential to be over 2000 characters, which is the max amount of characters
+        # discord allows you to send in a message. Truncate it if it's too long
+        # TODO probably find a more elegant way to do this
         if len(line) > 2000:
             line = line[:1996] + '...'
 
@@ -263,7 +285,7 @@ class RoleCommands(commands.Cog):
     @staticmethod
     def is_assignable_role(role: discord.Role):
         """
-        :param role: A Discord role
+        :param role: A Discord guild role
         :return: True if the role should be self-assignable, False otherwise
         """
         return role.color.value in ASSIGNABLE_ROLE_COLORS
@@ -271,7 +293,7 @@ class RoleCommands(commands.Cog):
     @staticmethod
     def native_role_count(user: discord.Member):
         """
-        :param user: A Discord user
+        :param user: A Discord guild member
         :return: The number of native language roles the user has
         """
         return len([role for role in user.roles if role.color.value == NATIVE_COLOR])
