@@ -6,7 +6,7 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-discord-py = "*"
+discord-py = ">=1.2.5"
 more-itertools = "*"
 
 [requires]
