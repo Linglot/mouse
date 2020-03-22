@@ -10,12 +10,13 @@ class Events(Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @Cog.listener()
     async def on_voice_state_update(self, member, before, after):
         # VC user was before changing his state
         # None if he wasn't in VC before
         server = member.guild
-        left_from = before.channel if before.channel is not None else None
-        joined_to = after.channel if after.channel is not None else None
+        left_from = before.channel
+        joined_to = after.channel
 
         # Joining events
         if joined_to is not None:
