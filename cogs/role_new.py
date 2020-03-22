@@ -52,8 +52,7 @@ class RoleCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='role',
-                      aliases=['native', 'fluent', 'learning'])
+    @commands.command(name='role', aliases=['native', 'fluent', 'learning'])
     @commands.guild_only()
     async def role_command(self, ctx: commands.Context, *, role: Union[LinglotRole, LinglotLanguageRole]):
         # noinspection PyTypeChecker
@@ -175,9 +174,7 @@ class RoleCommands(commands.Cog):
     # don't trigger a cooldown,
     @commands.command(name='ping', cooldown_after_parsing=True)
     @commands.has_any_role('Event Host', 'Bot dev', *ADMIN_ROLES)
-    @commands.cooldown(rate=1,
-                       per=settings['roles']['ping']['cooldown'],
-                       type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=settings['roles']['ping']['cooldown'], type=commands.BucketType.user)
     @commands.guild_only()
     async def ping_command(self, ctx: commands.Context, *, roles: LinglotRoleList):
         # Make sure the user is not trying to ping any blacklisted roles
