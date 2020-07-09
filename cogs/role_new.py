@@ -210,7 +210,7 @@ class RoleCommands(commands.Cog):
     # we specify cooldown_after_parsing=True so that ping commands that fail due to non-existent roles, or no arguments,
     # don't trigger a cooldown,
     @commands.command(name='ping', cooldown_after_parsing=True)
-    @commands.has_any_role('Event Host', 'Bot dev', *ADMIN_ROLES)
+    @commands.has_any_role('Event Host', *ADMIN_ROLES)
     @commands.cooldown(rate=1, per=settings['roles']['ping']['cooldown'], type=commands.BucketType.user)
     @commands.guild_only()
     async def ping_command(self, ctx: commands.Context, *, roles: LinglotRoleList):
@@ -244,8 +244,23 @@ class RoleCommands(commands.Cog):
     @commands.command(name='top10', aliases=['top'])
     @commands.guild_only()
     async def top_roles_command(self, ctx: commands.Context):
-        # TODO
-        pass
+        server = ctx.message.guild
+
+        roles = {role.name: len(role.members) for role in server.roles}
+
+        native, fluent, learning = self.__make_top10_lines(roles)
+
+        embed = discord.Embed(colour=discord.Colour(MAIN_COLOR))
+        embed.set_author(name=server.name, icon_url=server.icon_url)
+
+        embed.add_field(name="Natives", value=native, inline=True)
+        embed.add_field(name="Fluent", value=fluent, inline=True)
+        embed.add_field(name="Learning", value=learning, inline=True)
+
+        embed.set_footer(text="Out of {} roles and {} members".format(len(roles), len(server.members)),
+                         icon_url=self.bot.user.avatar_url)
+
+        await ctx.send(embed=embed)
 
     @commands.command(name='lessthan', aliases=['less'])
     @commands.has_any_role(*ADMIN_ROLES)
@@ -328,6 +343,28 @@ class RoleCommands(commands.Cog):
         :return: The number of native language roles the user has
         """
         return len([role for role in user.roles if role.color.value == NATIVE_COLOR])
+
+    @staticmethod
+    def __make_top10_lines(roles):
+        sorted_roles = sorted(roles.items(), reverse=True, key=operator.itemgetter(1))
+
+        native, fluent, learning = {}, {}, {}
+        for key, value in sorted_roles:
+            role_name = key.split()
+            if role_name[0] == "Native" and len(native) < 10:
+                native[role_name[1]] = value
+            if role_name[0] == "Fluent" and len(fluent) < 10:
+                fluent[role_name[1]] = value
+            if role_name[0] == "Learning" and len(learning) < 10 and role_name[1].lower() != 'other':
+                learning[role_name[1]] = value
+
+            if native == fluent == learning == 10:
+                break
+
+        def make_line(role_list) -> str:
+            return '\n'.join([f"[{v}] {k}" for k, v in role_list.items()])
+
+        return make_line(native), make_line(fluent), make_line(learning)
 
 
 def setup(bot: commands.Bot):
