@@ -6,7 +6,7 @@ from discord.ext import commands
 
 from settings.config import settings
 from settings.constants import ASSIGNABLE_ROLE_COLORS, NATIVE_COLOR, YES_EMOJI, INFO_COLOR, MAIN_COLOR, NO_EMOJI, \
-    ADMIN_ROLES
+    ADMIN_ROLES, LEARNING_COLOR, FLUENT_COLOR
 from settings.lines import text_lines
 from utils.utils import send_error_embed, chunks
 
@@ -292,6 +292,34 @@ class RoleCommands(commands.Cog):
     async def lessthan_error(self, ctx, error):
         if isinstance(error, commands.BadArgument):
             return await send_error_embed(ctx, 'You must pass a number to this command')
+
+    @commands.command(name='list')
+    @commands.guild_only()
+    async def list_command(self, ctx: commands.Context, role_type: str):
+        if not role_type.lower() in ['native', 'fluent', 'learning']:
+            return await send_error_embed(ctx, "You must specify 'native', 'fluent', or 'learning'.")
+
+        role_map = {
+            'native': NATIVE_COLOR,
+            'fluent': FLUENT_COLOR,
+            'learning': LEARNING_COLOR
+        }
+        role_type = role_type.title()
+        color = role_map[role_type.lower()]
+
+        roles = [role.name.replace(f"{role_type} ", '') for role in ctx.guild.roles if role.color.value == color]
+
+        # Add combined roles to the list of fluent tags (they are colored as native)
+        if role_type == 'Fluent':
+            combined_roles = [role.name for role in ctx.guild.roles if
+                              role.color.value == NATIVE_COLOR and not role.name.startswith('Native')]
+            roles += combined_roles
+        roles.sort()
+        return await ctx.send(content=f"**{role_type} roles: **" + ", ".join(roles))
+
+    @list_command.error
+    async def list_error(self, ctx: commands.Context, error):
+        await send_error_embed(ctx, "You must specify 'native', 'fluent', or 'learning'.")
 
     async def yes_no_dialogue(self, ctx, role):
         # TODO: fix this trash fire
