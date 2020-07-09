@@ -7,7 +7,7 @@ bot = Bot(command_prefix=PREFIX, fetch_offline_members=True)
 extensions = [
     # Commands
     'cogs.info',
-    'cogs.role_new',
+    'cogs.role',
     'cogs.voice',
 
     # Events
