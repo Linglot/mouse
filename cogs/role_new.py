@@ -8,7 +8,7 @@ from settings.config import settings
 from settings.constants import ASSIGNABLE_ROLE_COLORS, NATIVE_COLOR, YES_EMOJI, INFO_COLOR, MAIN_COLOR, NO_EMOJI, \
     ADMIN_ROLES
 from settings.lines import text_lines
-from utils.utils import send_error_embed
+from utils.utils import send_error_embed, chunks
 
 
 # Basically, this lets us specify that a command requires a *valid role* as an argument.
@@ -153,11 +153,48 @@ class RoleCommands(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command(name='search')
+    @commands.command(name='search', aliases=['who', 'inrole', 'inroles'])
     @commands.guild_only()
     async def search_command(self, ctx: commands.Context, *, roles: LinglotRoleList):
-        # TODO
-        pass
+        found = []
+        for member in ctx.guild.members:
+            if roles.issubset(member.roles):
+                found.append(member)
+
+        title_line = ", ".join(role.name for role in roles)
+
+        if not len(found):
+            no_results = discord.Embed(title=text_lines['roles']['search']['no_users_title'],
+                                       description=text_lines['roles']['search']['try_again'],
+                                       colour=discord.Colour(MAIN_COLOR))
+            return await ctx.send(embed=no_results)
+        elif len(found) == 1:
+            title = text_lines['roles']['search']['one_user'].format(title_line)
+        else:
+            title = text_lines['roles']['search']['x_users'].format(len(found), title_line)
+
+        embed = discord.Embed(title=title, color=discord.Colour(MAIN_COLOR))
+
+        if len(found) < 6:
+            if len(found) == 1:
+                header = text_lines['roles']['search']['one_user_header']
+            else:
+                header = text_lines['roles']['search']['many_users_header'].format(1, len(found))
+
+            embed.add_field(name=header, value="\n".join(member.display_name for member in found), inline=True)
+        else:
+            if len(found) > 30:
+                embed.set_footer(text=text_lines['roles']['search']['and_more'].format(len(found) - 30))
+            chunked_list = list(chunks(found[:30], 10))
+            ranges = [[found.index(chunk[0]) + 1, found.index(chunk[-1]) + 1] for chunk in chunked_list]
+            for i in range(0, len(chunked_list)):
+                header = text_lines['roles']['search']['many_users_header'].format(*ranges[i])
+                members = "\n".join(
+                    member.display_name[:settings['roles']['search']['max_length']] for member in chunked_list[i]
+                )
+                embed.add_field(name=header, value=members, inline=True)
+
+        return await ctx.send(embed=embed)
 
     @count_command.error
     @search_command.error
@@ -274,10 +311,7 @@ class RoleCommands(commands.Cog):
         :param member: A discord guild member
         :return: True if the user is a server admin, False otherwise
         """
-        for role in member.roles:
-            if role.name.title() in ADMIN_ROLES:
-                return True
-        return False
+        return any(role.name.title() in ADMIN_ROLES for role in member.roles)
 
     @staticmethod
     def is_assignable_role(role: discord.Role):

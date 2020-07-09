@@ -20,3 +20,10 @@ async def send_info_embed(ctx, message):
 
 def is_mod(member):
     return any([role in MOD_ROLES for role in member.roles])
+
+
+# From https://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
