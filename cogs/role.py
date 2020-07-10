@@ -29,13 +29,33 @@ class LinglotRole(commands.RoleConverter):
 # for ;native, ;fluent, and ;learning
 class LinglotLanguageRole(LinglotRole):
     async def convert(self, ctx: commands.Context, argument):
+        print("Trying to convert " + argument)
         try:
             return await super().convert(ctx, ctx.invoked_with + ' ' + argument)
         except commands.BadArgument as BA:
             # some languages are merged and do not have separate native/fluent roles
             if ctx.invoked_with in ['native', 'fluent']:
                 return await super().convert(ctx, argument)
-            raise BA
+
+
+# I have to do this because for some reason, Union[LinglotLanguageRole, LinglotRole] does not work anymore
+class LinglotLanguageRole2(commands.RoleConverter):
+    async def convert(self, ctx: commands.Context, argument):
+        if ctx.invoked_with in ['native', 'fluent', 'learning']:
+            role = ctx.invoked_with + ' ' + argument
+        else:
+            role = argument
+        print("Trying to convert " + role)
+
+        try:
+            return await super().convert(ctx, role.title())
+        except commands.BadArgument:
+            try:
+                return await super().convert(ctx, role.capitalize())
+            except commands.BadArgument as BA:
+                if ctx.invoked_with in ['native', 'fluent']:
+                    return await super().convert(ctx, argument.capitalize())
+                raise BA
 
 
 class LinglotRoleList(LinglotRole):
@@ -54,7 +74,7 @@ class RoleCommands(commands.Cog):
 
     @commands.command(name='role', aliases=['native', 'fluent', 'learning'])
     @commands.guild_only()
-    async def role_command(self, ctx: commands.Context, *, role: Union[LinglotRole, LinglotLanguageRole]):
+    async def role_command(self, ctx: commands.Context, *, role: LinglotLanguageRole2):
         # noinspection PyTypeChecker
         if not self.is_assignable_role(role):
             # Role isn't self-assignable
