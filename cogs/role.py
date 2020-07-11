@@ -1,5 +1,4 @@
 import operator
-from typing import Union
 
 import discord
 from discord.ext import commands
@@ -7,8 +6,9 @@ from discord.ext import commands
 from settings.config import settings
 from settings.constants import ASSIGNABLE_ROLE_COLORS, NATIVE_COLOR, YES_EMOJI, INFO_COLOR, MAIN_COLOR, NO_EMOJI, \
     ADMIN_ROLES, LEARNING_COLOR, FLUENT_COLOR
-from settings.lines import text_lines
 from utils.utils import send_error_embed, chunks
+
+import i18n
 
 
 # Basically, this lets us specify that a command requires a *valid role* as an argument.
@@ -78,21 +78,21 @@ class RoleCommands(commands.Cog):
         # noinspection PyTypeChecker
         if not self.is_assignable_role(role):
             # Role isn't self-assignable
-            return await send_error_embed(ctx, text_lines['roles']['assign']['not_allowed'])
+            return await send_error_embed(ctx, i18n.t('role.assign.not_allowed'))
 
         if role in ctx.author.roles:
             if self.native_role_count(ctx.author) == 1 and role.color.value == NATIVE_COLOR:
                 # User is trying to remove their only native role
-                return await send_error_embed(ctx, text_lines['roles']['assign']['cant_remove_native'])
+                return await send_error_embed(ctx, i18n.t('role.assign.native.cant_remove'))
             else:
                 return await self.yes_no_dialogue(ctx, role)
         else:
             if self.native_role_count(ctx.author) == 0 and role.color.value != NATIVE_COLOR:
                 # User does not have a native role, they should add one first!
-                return await send_error_embed(ctx, text_lines['roles']['assign']['native_first'])
+                return await send_error_embed(ctx, i18n.t('role.assign.native.native_first'))
             # add the user to the role, then let them know it was successful
             await ctx.author.add_roles(role, reason='self-added')
-            embed = discord.Embed(title=text_lines['roles']['assign']['added'].format(role.name),
+            embed = discord.Embed(title=i18n.t('role.assign.added', role=role),
                                   colour=discord.Colour(MAIN_COLOR))
             await ctx.send(embed=embed)
 
@@ -102,18 +102,18 @@ class RoleCommands(commands.Cog):
         # noinspection PyTypeChecker
         if not self.is_assignable_role(role):
             # Role isn't self-assignable
-            return await send_error_embed(ctx, text_lines['roles']['assign']['not_allowed'])
+            return await send_error_embed(ctx, i18n.t('role.assign.not_allowed'))
 
         if role not in ctx.author.roles:
             # User does not have the role
-            return await send_error_embed(ctx, text_lines['roles']['assign']['dont_have'])
+            return await send_error_embed(ctx, i18n.t('role.assign.dont_have'))
 
         if self.native_role_count(ctx.author) == 1 and role.color.value == NATIVE_COLOR:
             # User is trying to remove their only native role
-            return await send_error_embed(ctx, text_lines['roles']['assign']['cant_remove_native'])
+            return await send_error_embed(ctx, i18n.t('role.assign.native.cant_remove'))
 
         await ctx.author.remove_roles(role, reason='self-removed')
-        embed = discord.Embed(title=text_lines['roles']['assign']['removed'].format(role.name),
+        embed = discord.Embed(title=i18n.t('role.assign.removed', role=role.name),
                               color=discord.Color(MAIN_COLOR))
 
         await ctx.send(embed=embed)
@@ -127,22 +127,21 @@ class RoleCommands(commands.Cog):
 
         # User didn't provide any roles
         elif isinstance(error, commands.MissingRequiredArgument):
-            await send_error_embed(ctx, text_lines['roles']['assign']['empty'])
+            await send_error_embed(ctx, i18n.t('general.commands.roles_not_provided'))
 
         # User provided a non-existent role to ;role or ;fluent or ;native
         elif isinstance(error, commands.BadUnionArgument):
             role: str = ctx.message.content.replace(ctx.prefix + ctx.invoked_with + ' ', '')
             if ctx.invoked_with in ['fluent', 'native']:
                 role = ctx.invoked_with + ' ' + role
-            await send_error_embed(ctx, text_lines['roles']['search']['no_role'].format(role.title()))
+            await send_error_embed(ctx, i18n.t('general.commands.roles_dont_exist', count=1))
 
     @commands.command(name='count')
     @commands.guild_only()
     async def count_command(self, ctx: commands.Context, *, roles: LinglotRoleList):
         # noinspection PyTypeChecker
         if len(roles) > settings['roles']['search']['limit']:
-            return await send_error_embed(ctx, text_lines['roles']['search']['limit']
-                                          .format(settings['roles']['search']['limit']))
+            return await send_error_embed(ctx, i18n.t('role.search.limit', max=settings['roles']['search']['limit']))
 
         # Find total users who have *all* of the provided roles
         total = sum(roles.issubset(user.roles) for user in ctx.guild.members)
@@ -153,16 +152,13 @@ class RoleCommands(commands.Cog):
         # Generate a list of how many users have *each* role
         for role in roles:
             users_in_role = sum(role in user.roles for user in ctx.guild.members)
-            embed_body += text_lines['roles']['count']['total'].format(role.name, users_in_role)
+            # embed_body += text_lines['roles']['count']['total'].format(role.name, users_in_role)
+            embed_body += i18n.t('role.count.total', count=users_in_role, role=role.name) + '\n'
 
         # noinspection PyTypeChecker
         role_names = ', '.join(role.name for role in roles)
-        if total <= 0:
-            embed_title = text_lines['roles']['count']['no_users'].format(role_names)
-        elif total == 1:
-            embed_title = text_lines['roles']['count']['one_user'].format(role_names)
-        else:
-            embed_title = text_lines['roles']['count']['x_users'].format(total, role_names)
+
+        embed_title = i18n.t('role.count.users', count=total, role_list=role_names)
 
         embed = discord.Embed(title=embed_title,
                               color=discord.Color(MAIN_COLOR))
@@ -184,31 +180,24 @@ class RoleCommands(commands.Cog):
         title_line = ", ".join(role.name for role in roles)
 
         if not len(found):
-            no_results = discord.Embed(title=text_lines['roles']['search']['no_users_title'],
-                                       description=text_lines['roles']['search']['try_again'],
+            no_results = discord.Embed(title=i18n.t('role.search.no_users'),
+                                       description=i18n.t('role.search.try_again'),
                                        colour=discord.Colour(MAIN_COLOR))
             return await ctx.send(embed=no_results)
-        elif len(found) == 1:
-            title = text_lines['roles']['search']['one_user'].format(title_line)
-        else:
-            title = text_lines['roles']['search']['x_users'].format(len(found), title_line)
+        title = i18n.t('role.search.users.body', count=found, role_list=title_line)
 
         embed = discord.Embed(title=title, color=discord.Colour(MAIN_COLOR))
 
         if len(found) < 6:
-            if len(found) == 1:
-                header = text_lines['roles']['search']['one_user_header']
-            else:
-                header = text_lines['roles']['search']['many_users_header'].format(1, len(found))
-
+            header = i18n.t('role.search.users.header', count=len(found), start=1, end=len(found))
             embed.add_field(name=header, value="\n".join(member.display_name for member in found), inline=True)
         else:
             if len(found) > 30:
-                embed.set_footer(text=text_lines['roles']['search']['and_more'].format(len(found) - 30))
+                embed.set_footer(text=i18n.t('role.search.users.more', count=len(found) - 30))
             chunked_list = list(chunks(found[:30], 10))
             ranges = [[found.index(chunk[0]) + 1, found.index(chunk[-1]) + 1] for chunk in chunked_list]
             for i in range(0, len(chunked_list)):
-                header = text_lines['roles']['search']['many_users_header'].format(*ranges[i])
+                header = i18n.t('role.search.users.header', count=2, start=ranges[i][0], end=ranges[i][1])
                 members = "\n".join(
                     member.display_name[:settings['roles']['search']['max_length']] for member in chunked_list[i]
                 )
@@ -221,11 +210,11 @@ class RoleCommands(commands.Cog):
     async def role_search_error(self, ctx: commands.Context, error):
         # user provided one or more non-existent roles
         if isinstance(error, commands.BadArgument):
-            await send_error_embed(ctx, 'Sorry, one or more of those roles does not exist!')
+            await send_error_embed(ctx, i18n.t('general.commands.roles_dont_exist', count=1))
 
         # user provided no roles
         elif isinstance(error, commands.MissingRequiredArgument):
-            await send_error_embed(ctx, 'You must provide one or more roles for this command!')
+            await send_error_embed(ctx, i18n.t('general.commands.roles_not_provided'))
 
     # we specify cooldown_after_parsing=True so that ping commands that fail due to non-existent roles, or no arguments,
     # don't trigger a cooldown,
@@ -237,20 +226,21 @@ class RoleCommands(commands.Cog):
         # Make sure the user is not trying to ping any blacklisted roles
         # noinspection PyTypeChecker
         if any([role.name in settings['roles']['ping']['blacklist'] for role in roles]):
-            return await send_error_embed(ctx, 'Sorry, one or more of those roles is not ping-able!')
+            return await send_error_embed(ctx, i18n.t('role.ping.not_allowed'))
 
+        role_list = ', '.join(role.mention for role in roles)
         # noinspection PyTypeChecker
-        await ctx.send(f"PING! {ctx.author.mention} is pinging {', '.join(role.mention for role in roles)}")
+        await ctx.send(i18n.t('role.ping.body', author=ctx.author.mention, role_list=role_list))
 
     @ping_command.error
     async def ping_error(self, ctx: commands.Context, error):
         # User did not provide a valid list of roles
         if isinstance(error, commands.BadArgument):
-            await send_error_embed(ctx, 'Sorry, one or more of those roles does not exist!')
+            await send_error_embed(ctx, i18n.t('general.commands.roles_dont_exist', count=2))
 
         # user provided no roles
         elif isinstance(error, commands.MissingRequiredArgument):
-            await send_error_embed(ctx, 'Sorry, you need to provide at least one role to ping')
+            await send_error_embed(ctx, i18n.t('role.ping.missing_roles'))
 
         # User is hitting cooldown for this command
         elif isinstance(error, commands.CommandOnCooldown):
@@ -259,7 +249,7 @@ class RoleCommands(commands.Cog):
                 # ... then bypass the cooldown and let them use it!
                 await ctx.reinvoke()
             else:
-                await send_error_embed(ctx, 'Sorry, this command is on cooldown!')
+                await send_error_embed(ctx, i18n.t('general.commands.on_cooldown'))
 
     @commands.command(name='top10', aliases=['top'])
     @commands.guild_only()
@@ -273,11 +263,11 @@ class RoleCommands(commands.Cog):
         embed = discord.Embed(colour=discord.Colour(MAIN_COLOR))
         embed.set_author(name=server.name, icon_url=server.icon_url)
 
-        embed.add_field(name="Natives", value=native, inline=True)
-        embed.add_field(name="Fluent", value=fluent, inline=True)
-        embed.add_field(name="Learning", value=learning, inline=True)
+        embed.add_field(name=i18n.t('role.top10.native'), value=native, inline=True)
+        embed.add_field(name=i18n.t('role.top10.fluent'), value=fluent, inline=True)
+        embed.add_field(name=i18n.t('role.top10.learning'), value=learning, inline=True)
 
-        embed.set_footer(text="Out of {} roles and {} members".format(len(roles), len(server.members)),
+        embed.set_footer(text=i18n.t('role.top10.footer', role_count=len(roles), member_count=len(server.members)),
                          icon_url=self.bot.user.avatar_url)
 
         await ctx.send(embed=embed)
@@ -289,7 +279,7 @@ class RoleCommands(commands.Cog):
 
         # make sure the target role size is within the right limits
         if target_size <= 0 or target_size > settings['roles']['less_than']['limit']:
-            return await send_error_embed(ctx, 'Number out of range')
+            return await send_error_embed(ctx, i18n.t('general.commands.out_of_range'))
 
         # generate the list, greatest to least, of the roles with less than `target_size` members
         output = {role.name: len(role.members) for role in ctx.guild.roles if len(role.members) < target_size}
@@ -303,7 +293,7 @@ class RoleCommands(commands.Cog):
             line = line[:1996] + '...'
 
         embed = discord.Embed(colour=discord.Colour(MAIN_COLOR),
-                              title=text_lines['roles']['less_than']['title'].format(target_size),
+                              title=i18n.t('role.less.title', count=target_size),
                               description=line)
 
         await ctx.send(embed=embed)
@@ -311,13 +301,13 @@ class RoleCommands(commands.Cog):
     @less_than_command.error
     async def lessthan_error(self, ctx, error):
         if isinstance(error, commands.BadArgument):
-            return await send_error_embed(ctx, 'You must pass a number to this command')
+            return await send_error_embed(ctx, i18n.t('general.commands.must_pass_number'))
 
     @commands.command(name='list')
     @commands.guild_only()
     async def list_command(self, ctx: commands.Context, role_type: str):
         if not role_type.lower() in ['native', 'fluent', 'learning']:
-            return await send_error_embed(ctx, "You must specify 'native', 'fluent', or 'learning'.")
+            return await send_error_embed(ctx, i18n.t('role.list.must_specify_type'))
 
         role_map = {
             'native': NATIVE_COLOR,
@@ -335,16 +325,16 @@ class RoleCommands(commands.Cog):
                               role.color.value == NATIVE_COLOR and not role.name.startswith('Native')]
             roles += combined_roles
         roles.sort()
-        return await ctx.send(content=f"**{role_type} roles: **" + ", ".join(roles))
+        return await ctx.send(content=i18n.t('role.list.body', role_type=role_type, role_list=", ".join(roles)))
 
     @list_command.error
     async def list_error(self, ctx: commands.Context, error):
-        await send_error_embed(ctx, "You must specify 'native', 'fluent', or 'learning'.")
+        return await send_error_embed(ctx, i18n.t('role.list.must_specify_type'))
 
     async def yes_no_dialogue(self, ctx, role):
         # TODO: fix this trash fire
-        embed = discord.Embed(title=text_lines['roles']['assign']['already_have_title'],
-                              description=text_lines['roles']['assign']['already_have_msg'],
+        embed = discord.Embed(title=i18n.t('role.assign.already_have.title'),
+                              description=i18n.t('role.assign.already_have.body'),
                               colour=discord.Colour(INFO_COLOR))
         msg = await ctx.send(embed=embed)
         await msg.add_reaction(YES_EMOJI)
@@ -359,10 +349,10 @@ class RoleCommands(commands.Cog):
         else:
             if reaction.emoji == YES_EMOJI:
                 await user.remove_roles(role, reason='self-removed')
-                embed = discord.Embed(title=text_lines['roles']['assign']['removed'].format(role.name),
+                embed = discord.Embed(title=i18n.t('role.assign.removed', role=role.name),
                                       colour=discord.Colour(MAIN_COLOR))
             else:
-                embed = discord.Embed(title=text_lines['roles']['assign']['keep'].format(role.name),
+                embed = discord.Embed(title=i18n.t('role.assign.keep', role=role.name),
                                       colour=discord.Colour(MAIN_COLOR))
 
             await msg.edit(embed=embed)
