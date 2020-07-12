@@ -1,4 +1,4 @@
-en:
+eng:
   list:
     must_specify_type: "Which list are you looking for? You can select one of the following:"
     body: "**%{role_type} roles**: %{role_list}"
