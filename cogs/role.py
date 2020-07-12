@@ -417,12 +417,12 @@ class RoleCommands(commands.Cog):
     def get_user_locale(user: discord.Member):
         native_roles = [role.name.replace('Native ', '') for role in user.roles if role.color.value == NATIVE_COLOR]
         if len(native_roles) == 0:
-            return 'en'
+            return 'eng'
         native_roles.sort()
         try:
             return LANGUAGE_CODES[native_roles[0]]
         except KeyError:
-            return 'en'
+            return 'eng'
 
     @staticmethod
     def __make_top10_lines(roles):

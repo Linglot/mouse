@@ -98,7 +98,7 @@ LANGUAGE_CODES = {
     'Slovene': 'slv',
     'Spanish': 'spa',
     'Swahili': 'swa',
-    'Sewdish': 'swe',
+    'Swedish': 'swe',
     'Tagalog': 'tgl',
     'Tamil': 'tam',
     'Tatar': 'tat',
