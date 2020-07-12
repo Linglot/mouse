@@ -1,5 +1,6 @@
 from discord import Forbidden
-from discord.ext.commands import CheckFailure, NoPrivateMessage, CommandNotFound, BadArgument, Cog
+from discord.ext.commands import CheckFailure, NoPrivateMessage, CommandNotFound, BadArgument, Cog, \
+    MissingRequiredArgument
 
 from settings.lines import text_lines
 from utils.utils import send_error_embed
@@ -13,6 +14,9 @@ class OnError(Cog):
     async def on_command_error(self, ctx, exception):
         channel = ctx.channel
 
+        if hasattr(ctx.command, 'on_error'):
+            return
+
         if isinstance(exception, NoPrivateMessage):
             await send_error_embed(ctx, text_lines['technical']['cant_do_in_pm'])
         elif isinstance(exception, BadArgument):
@@ -20,6 +24,8 @@ class OnError(Cog):
         elif isinstance(exception, CheckFailure):
             await send_error_embed(ctx, text_lines['roles']['ping']['no_access'])
         elif isinstance(exception, CommandNotFound):
+            return
+        elif isinstance(exception, MissingRequiredArgument):
             return
         elif isinstance(exception, Forbidden):
             await send_error_embed(ctx, text_lines['technical']['forbidden'].format(channel.name, ctx.guild), dm=True)

@@ -1,6 +1,6 @@
 en:
   list:
-    must_specify_type: You must specify 'native', 'fluent', or 'learning'.
+    must_specify_type: "Which list are you looking for? You can select one of the following:"
     body: "**%{role_type} roles**: %{role_list}"
   assign:
     added: The role **%{role}** has been added
