@@ -5,7 +5,7 @@ from settings.config import TOKEN, PREFIX
 import i18n
 
 i18n.load_path.append("i18n/")
-i18n.config.set('fallback', 'en')
+i18n.config.set('fallback', 'eng')
 
 bot = Bot(command_prefix=PREFIX, fetch_offline_members=True)
 
