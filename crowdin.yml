@@ -1,0 +1,5 @@
+files:
+  - source: /i18n/*.eng.yml
+    translation: '/i18n/%file_name%%three_letters_code%.yml'
+    translation_replace:
+      '.eng': '.'

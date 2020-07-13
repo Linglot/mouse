@@ -1,0 +1,9 @@
+eng:
+  commands:
+    on_cooldown: Sorry, this command is on cooldown!
+    roles_dont_exist:
+      one: Sorry, that role does not exist!
+      many: Sorry, one or more of those roles does not exist!
+    roles_not_provided: You must provide one or more roles for this command!
+    out_of_range: Number out of range
+    must_pass_number: You must pass a number to this command

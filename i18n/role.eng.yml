@@ -1,0 +1,46 @@
+eng:
+  list:
+    must_specify_type: "Which list are you looking for? You can select one of the following:"
+    body: "**%{role_type} roles**: %{role_list}"
+  assign:
+    added: The role **%{role}** has been added
+    removed: The role **%{role}** has been removed
+    keep: You already had **%{role}** and opted to keep it
+    already_have:
+      title: You already have this role
+      body: React with ✅ to remove it or react with ❌ if you don't want to do that. _Ignoring this message is also an option if you don't want to remove it_
+    not_allowed: You can't self-assign this role
+    dont_have: You don't have that role
+    native:
+      cant_remove: Did you add the wrong native tag? Add your actual native language first, then remove the incorrect tag using ;not
+      need_role: "**You need to tag your native language first**. Once you have a native tag, you can add learning and fluent tags."
+  search:
+    limit: You have to search at least 1 role, up to a maximum of %{max}
+    role_doesnt_exist: The role **%{role}** does not exist on the server.
+    no_users: No users were found
+    try_again: Please try again
+    users:
+      body:
+        one: 1 user matching %{role_list}
+        many: "%{count} users matching %{role_list}"
+      header:
+        one: The one and only
+        many: "%{start} - %{end}"
+      more: And %{count} more...
+  count:
+    users:
+      zero: No users match the combination %{role_list}
+      one: 1 user matches the combination %{role_list}
+      many: "%{count} users match the combination %{role_list}"
+    total: Total in %{role} - **%{count}**
+  ping:
+    not_allowed: Sorry, you cannot ping 1 or more of those roles!
+    missing_roles: Sorry, you need to provide at least one role to ping!
+    body: PING! %{author} is pinging %{role_list}
+  top10:
+    native: Native
+    fluent: Fluent
+    learning: Learning
+    footer: Out of %{role_count} roles and %{member_count} members
+  less:
+    title: Roles with fewer than %{count} members
