@@ -45,6 +45,10 @@ class LinglotLanguageRole2(commands.RoleConverter):
             role = ctx.invoked_with + ' ' + argument
         else:
             role = argument
+
+        if role.lower().endswith('ipa'):
+            return await super().convert(ctx, role.title().replace("Ipa", "IPA"))
+
         print("Trying to convert " + role)
 
         try:
