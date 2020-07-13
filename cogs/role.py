@@ -20,6 +20,8 @@ from utils.utils import send_error_embed, chunks
 # See https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html#advanced-converters
 class LinglotRole(commands.RoleConverter):
     async def convert(self, ctx, argument):
+        if argument.lower().endswith('ipa'):
+            return await super().convert(ctx, argument.title().replace("Ipa", "IPA"))
         try:
             return await super().convert(ctx, argument.title())
         except commands.BadArgument:
