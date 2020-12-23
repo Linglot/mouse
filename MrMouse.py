@@ -1,8 +1,12 @@
+from discord import Intents
+
 from discord.ext.commands import Bot
 
 from settings.config import TOKEN, PREFIX
 
-bot = Bot(command_prefix=PREFIX, fetch_offline_members=True)
+intents = Intents(messages=True, guilds=True, members=True)
+
+bot = Bot(command_prefix=PREFIX, fetch_offline_members=True, intents=intents)
 
 extensions = [
     # Commands
